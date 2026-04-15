@@ -650,7 +650,7 @@
 
   let players = [], currentPlayer = null, pinBuf = "", prodBuf = "", lastSync = null;
 
-  let ch1State = { running:false, seconds:ROUND_SECS, round:0, revealed:false, revealTimer:null, intervalId:null, pollId:null };
+  let ch1State = { running:false, seconds:ROUND_SECS, round:0, revealed:false, revealTimer:null, intervalId:null, pollId:null, playerCountdown:null };
   let ch2State = { phase:'idle', seconds:CH2_COLLECT_SECS, intervalId:null, playerPollId:null, submissions:{} };
   let ch2Player = { word:'', leftover:0, submitted:false };
 
@@ -792,17 +792,42 @@
     const newRound = parseInt(gs.ch1_round) || 0;
     const newRunning = gs.ch1_running === 'TRUE' || gs.ch1_running === true;
     const newRevealed = gs.ch1_revealed === 'TRUE' || gs.ch1_revealed === true;
+    const wasRunning = ch1State.running;
 
     ch1State.round = newRound;
-    ch1State.running = newRunning;
-    // Revealed state persists until producer changes it — no auto-hide
     ch1State.revealed = newRevealed;
 
-    // Update ch2 (Toxic Transfer) phase — shares ch1 controls
-    const ch2Phase = gs.ch2_phase || 'idle';
-    if (ch2Phase !== (prev.ch2_phase || 'idle')) {
-      ch2State.phase = ch2Phase;
+    // If producer just started the round — kick off local countdown on player's phone
+    if (newRunning && !wasRunning) {
+      ch1State.running = true;
+      ch1State.seconds = ROUND_SECS;
+      clearInterval(ch1State.playerCountdown);
+      ch1State.playerCountdown = setInterval(() => {
+        ch1State.seconds--;
+        if (ch1State.seconds <= 0) {
+          ch1State.seconds = 0;
+          clearInterval(ch1State.playerCountdown);
+          ch1State.playerCountdown = null;
+          // Don't set running=false here — wait for sheet to confirm
+        }
+      }, 1000);
     }
+
+    // If producer paused or stopped — stop local countdown
+    if (!newRunning && wasRunning) {
+      ch1State.running = false;
+      clearInterval(ch1State.playerCountdown);
+      ch1State.playerCountdown = null;
+    }
+
+    // If a new round starts (round number changed) — reset timer
+    if (newRound !== (parseInt(prev.ch1_round) || 0) && !newRunning) {
+      ch1State.seconds = ROUND_SECS;
+      clearInterval(ch1State.playerCountdown);
+      ch1State.playerCountdown = null;
+    }
+
+    ch1State.running = newRunning;
 
     // Update ch5 (Intel Scramble) phase
     const ch5Phase = gs.ch5_phase || 'idle';
