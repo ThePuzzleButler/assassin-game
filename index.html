@@ -17,6 +17,10 @@
     .divider { height: 0.5px; background: #1e1e1e; margin: 18px 0; }
     .back-btn { background: transparent; border: 0.5px solid #2a2a2a; border-radius: 6px; color: #666; font-size: 11px; padding: 7px 14px; cursor: pointer; letter-spacing: 1px; }
     .back-btn:hover { border-color: #c9a84c; color: #c9a84c; }
+    .sync-btn { background: transparent; border: 0.5px solid #2a2a2a; border-radius: 6px; color: #444; font-size: 10px; padding: 6px 12px; cursor: pointer; letter-spacing: 1px; margin-left: 8px; }
+    .sync-btn:hover { border-color: #7ec8e3; color: #7ec8e3; }
+    .sync-btn.syncing { color: #7ec8e3; border-color: #7ec8e3; animation: pulse 1s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:.5} 50%{opacity:1} }
     .ghost-btn { background: transparent; border: 0.5px solid #2a2a2a; border-radius: 8px; color: #555; font-size: 12px; padding: 12px 16px; cursor: pointer; width: 100%; letter-spacing: 1px; margin-top: 10px; }
     .ghost-btn:hover { background: #1a1a1a; color: #aaa; }
     .gold-btn { background: transparent; border: 1px solid #c9a84c; border-radius: 10px; color: #c9a84c; font-size: 13px; font-weight: 600; padding: 16px; cursor: pointer; width: 100%; letter-spacing: 2px; margin-top: 16px; transition: background .2s; }
@@ -104,287 +108,318 @@
     .prod-nav-label { font-size: 13px; font-weight: 600; letter-spacing: 2px; color: #f0f0f0; margin-bottom: 4px; }
     .prod-nav-sub { font-size: 10px; color: #444; letter-spacing: 1px; }
     .prod-nav-tile.roster-tile { border-color: #c9a84c33; }
-    .prod-nav-tile.roster-tile:hover { border-color: #c9a84c; }
     .prod-nav-tile.challenges-tile { border-color: #7ec8e333; }
-    .prod-nav-tile.challenges-tile:hover { border-color: #7ec8e3; }
 
-    /* Challenges hub tiles */
-    .challenge-hub-card { background: #111; border: 0.5px solid #1e1e1e; border-radius: 14px; padding: 20px; margin-bottom: 12px; cursor: pointer; transition: border-color .2s; display: flex; align-items: center; gap: 16px; }
-    .challenge-hub-card:hover { border-color: #c9a84c; }
-    .challenge-hub-num { font-size: 10px; color: #c9a84c; letter-spacing: 2px; width: 36px; flex-shrink: 0; }
-    .challenge-hub-info { flex: 1; }
-    .challenge-hub-title { font-size: 15px; font-weight: 600; margin-bottom: 3px; }
-    .challenge-hub-sub { font-size: 11px; color: #555; }
-    .challenge-hub-arrow { font-size: 16px; color: #333; }
-    .challenge-hub-badge { font-size: 9px; padding: 2px 8px; border-radius: 20px; letter-spacing: 1px; display: inline-block; margin-top: 6px; }
+    /* Challenge hub */
+    .ch-hub-card { background: #111; border: 0.5px solid #1e1e1e; border-radius: 14px; padding: 18px 20px; margin-bottom: 12px; cursor: pointer; transition: border-color .2s, background .2s; }
+    .ch-hub-card:hover { border-color: #c9a84c; background: #161616; }
+    .ch-hub-card.locked { cursor: default; opacity: 0.5; }
+    .ch-hub-card.locked:hover { border-color: #1e1e1e; background: #111; }
+    .ch-hub-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .ch-hub-num { font-size: 11px; color: #c9a84c; letter-spacing: 2px; }
+    .ch-hub-badge { font-size: 9px; padding: 3px 10px; border-radius: 20px; letter-spacing: 1px; }
+    .badge-locked { background: #111; color: #444; border: 0.5px solid #222; }
+    .badge-idle   { background: #1a1a1a; color: #555; border: 0.5px solid #2a2a2a; }
     .badge-running { background: #0d1a0d; color: #4a9; border: 0.5px solid #1a3a1a; }
-    .badge-idle    { background: #111; color: #444; border: 0.5px solid #222; }
+    .ch-hub-title { font-size: 16px; font-weight: 600; margin-bottom: 3px; }
+    .ch-hub-sub { font-size: 12px; color: #555; }
 
-    /* Challenge controls */
-    .ch-control-wrap { background: #0a0a0a; border: 1px solid #c9a84c33; border-radius: 14px; padding: 20px; margin-bottom: 16px; }
-    .ch-control-title { font-size: 11px; color: #c9a84c; letter-spacing: 2px; margin-bottom: 16px; }
-    .ch-info-row { display: flex; gap: 10px; margin-bottom: 14px; }
-    .ch-info-box { background: #111; border: 0.5px solid #1e1e1e; border-radius: 8px; padding: 10px; text-align: center; flex: 1; }
-    .ch-info-val { font-size: 20px; font-weight: 700; color: #c9a84c; }
-    .ch-info-lbl { font-size: 9px; color: #444; letter-spacing: 1px; margin-top: 2px; }
-    .ch-btn { border-radius: 10px; padding: 14px 8px; text-align: center; cursor: pointer; font-size: 12px; font-weight: 600; letter-spacing: 1px; border: 1px solid; transition: filter .15s; user-select: none; display: block; width: 100%; margin-bottom: 10px; }
-    .ch-btn:active { filter: brightness(1.3); }
-    .ch-btn-green { background: #0d2a0d; color: #4aaa6a; border-color: #1a4a1a; }
-    .ch-btn-green.running { background: #1a0808; color: #e24b4a; border-color: #3a1010; }
-    .ch-btn-gold  { background: #1a1008; color: #c9a84c; border-color: #2e2208; }
-    .ch-btn-blue  { background: #08101a; color: #7ec8e3; border-color: #102030; }
-    .ch-btn-gray  { background: transparent; border-color: #2a2a2a; color: #555; }
-    .ch-btn-gray:hover { border-color: #444; color: #888; }
-    .ch-btn-grid  { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+    /* Challenge 1 styles */
+    .timer-ring-container { position: relative; width: 200px; height: 200px; margin: 30px auto; }
+    .timer-ring { transform: rotate(-90deg); }
+    .timer-circle-bg { fill: none; stroke: #1a1a1a; stroke-width: 8; }
+    .timer-circle-fg { fill: none; stroke: #c9a84c; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 0.3s linear; }
+    .timer-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 42px; font-weight: 600; color: #c9a84c; }
+    .status-card { background: #111; border: 0.5px solid #1e1e1e; border-radius: 14px; padding: 24px; text-align: center; margin-bottom: 20px; }
+    .status-card.unknown { border-color: #2a2a2a; }
+    .status-card.infected { border-color: rgba(226,75,74,0.3); background: #1a0000; }
+    .status-card.healthy { border-color: rgba(74,170,106,0.3); background: #001a08; }
+    .status-icon { font-size: 64px; margin-bottom: 14px; }
+    .status-label { font-size: 10px; letter-spacing: 2px; color: #444; margin-bottom: 6px; }
+    .status-value { font-size: 20px; font-weight: 600; letter-spacing: 2px; }
+    .status-value.unknown { color: #555; }
+    .status-value.infected { color: #e24b4a; }
+    .status-value.healthy { color: #4aaa6a; }
 
-    /* CH2 timer */
-    .ch2-timer-big { font-size: 48px; font-weight: 700; color: #7ec8e3; letter-spacing: 2px; text-align: center; line-height: 1; margin-bottom: 4px; }
-    .ch2-timer-lbl { font-size: 10px; color: #444; letter-spacing: 2px; text-align: center; margin-bottom: 16px; }
+    /* Challenge 1 producer controls */
+    .prod-timer-big { font-size: 56px; font-weight: 600; color: #c9a84c; text-align: center; margin: 24px 0; }
+    .prod-round-info { text-align: center; margin-bottom: 20px; }
+    .prod-round-num { font-size: 32px; font-weight: 600; color: #f0f0f0; }
+    .prod-round-lbl { font-size: 11px; color: #444; letter-spacing: 2px; margin-top: 4px; }
+    .prod-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+    .prod-btn { border-radius: 10px; padding: 16px 12px; text-align: center; cursor: pointer; font-size: 13px; font-weight: 600; letter-spacing: 1px; border: 1px solid; transition: filter .15s; user-select: none; }
+    .prod-btn:active { filter: brightness(1.4); }
+    .prod-btn-start { background: #0d1a0d; color: #4aaa6a; border-color: #1a3a1a; }
+    .prod-btn-start:hover { filter: brightness(1.2); }
+    .prod-btn-start.running { background: #1a0d0d; color: #e24b4a; border-color: #3a1a1a; }
+    .prod-btn-pause { background: #1a1008; color: #c9a84c; border-color: #2e2208; }
+    .prod-btn-pause:hover { filter: brightness(1.2); }
+    .prod-btn-pause:disabled { opacity: 0.3; cursor: not-allowed; }
+    .prod-btn-reveal { background: #080d1e; color: #7ec8e3; border-color: #102030; grid-column: 1 / -1; }
+    .prod-btn-reveal:hover { filter: brightness(1.2); }
+    .prod-btn-next { background: #1a1008; color: #c9a84c; border-color: #2e2208; grid-column: 1 / -1; }
+    .prod-btn-next:hover { filter: brightness(1.2); }
 
-    /* Submission cards */
-    .submission-card { background: #0a0a0a; border: 0.5px solid #1e1e1e; border-radius: 12px; padding: 16px; margin-bottom: 10px; }
-    .submission-card.approved { border-color: #1e3e1e; }
-    .submission-card.rejected { border-color: #3e1e1e; opacity: 0.5; }
-    .sub-name  { font-size: 12px; font-weight: 600; color: #c9a84c; margin-bottom: 6px; letter-spacing: 1px; }
-    .sub-word  { font-size: 26px; font-weight: 700; letter-spacing: 4px; color: #f0f0f0; margin-bottom: 6px; }
+    /* Challenge 2 styles */
+    .ch2-timer-display { text-align: center; margin: 30px 0; }
+    .ch2-timer-val { font-size: 56px; font-weight: 600; color: #c9a84c; }
+    .ch2-timer-lbl { font-size: 11px; color: #444; letter-spacing: 2px; margin-top: 6px; }
+    .ch2-phase-card { background: #111; border: 0.5px solid #1e1e1e; border-radius: 12px; padding: 18px; margin-bottom: 20px; text-align: center; }
+    .ch2-phase-title { font-size: 11px; color: #444; letter-spacing: 2px; margin-bottom: 8px; }
+    .ch2-phase-msg { font-size: 14px; font-weight: 600; color: #f0f0f0; }
+    .ch2-form { background: #111; border: 0.5px solid #1e1e1e; border-radius: 12px; padding: 20px; }
+    .ch2-input-group { margin-bottom: 16px; }
+    .ch2-input-lbl { font-size: 10px; color: #444; letter-spacing: 2px; margin-bottom: 8px; display: block; }
+    .ch2-input { background: #0a0a0a; border: 0.5px solid #2a2a2a; border-radius: 8px; padding: 12px 14px; width: 100%; color: #f0f0f0; font-size: 14px; }
+    .ch2-input:focus { outline: none; border-color: #c9a84c; }
+
+    /* Challenge 2 producer */
+    .submission-card { background: #111; border: 0.5px solid #1e1e1e; border-radius: 14px; padding: 20px; margin-bottom: 14px; }
+    .submission-card.approved { border-color: rgba(74,170,106,0.3); background: #001a08; }
+    .submission-card.rejected { border-color: rgba(226,75,74,0.3); background: #1a0000; }
+    .sub-name { font-size: 11px; color: #c9a84c; letter-spacing: 2px; margin-bottom: 8px; }
+    .sub-word { font-size: 32px; font-weight: 600; text-align: center; margin: 14px 0; letter-spacing: 3px; }
     .sub-word.approved { color: #4aaa6a; }
     .sub-word.rejected { color: #e24b4a; }
-    .sub-meta  { font-size: 11px; color: #555; margin-bottom: 10px; line-height: 1.7; }
-    .sub-score { font-size: 15px; font-weight: 700; color: #c9a84c; margin-bottom: 10px; }
-    .sub-btns  { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .sub-approve { border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; font-size: 11px; font-weight: 600; letter-spacing: 1px; border: 1px solid #1e3e1e; background: #0d2a0d; color: #4aaa6a; }
-    .sub-reject  { border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; font-size: 11px; font-weight: 600; letter-spacing: 1px; border: 1px solid #3e1e1e; background: #1e0808; color: #e24b4a; }
-
-    /* Challenge rule cards */
-    .rule-card { background: #111; border: 0.5px solid #1e1e1e; border-radius: 12px; padding: 16px 18px; margin-bottom: 10px; display: flex; gap: 14px; align-items: flex-start; }
-    .rule-num  { font-size: 20px; font-weight: 700; color: #c9a84c; flex-shrink: 0; width: 26px; }
-    .rule-text { font-size: 13px; color: #ccc; line-height: 1.7; }
-    .rule-text strong { color: #f0f0f0; }
-
-    /* CH1 player */
-    .ch1-status-wrap { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 24px 40px; text-align: center; transition: background .6s; }
-    .timer-ring { position: relative; width: 130px; height: 130px; margin: 0 auto 6px; }
-    .timer-ring svg { transform: rotate(-90deg); }
-    .timer-ring circle { fill: none; stroke-width: 7; }
-    .timer-track { stroke: #1e1e1e; }
-    .timer-num { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 32px; font-weight: 700; color: #c9a84c; }
-    .waiting-msg { font-size: 11px; color: #333; letter-spacing: 2px; margin-top: 4px; margin-bottom: 32px; }
-    .unknown-card { background: #111; border: 0.5px solid #1e1e1e; border-radius: 20px; padding: 32px 28px; max-width: 260px; margin: 0 auto; }
-    .unknown-q { font-size: 64px; font-weight: 700; color: #222; line-height: 1; margin-bottom: 12px; }
-    .unknown-lbl { font-size: 11px; color: #333; letter-spacing: 2px; }
-
-    /* CH2 player */
-    .ch2-big-timer { font-size: 72px; font-weight: 700; color: #7ec8e3; letter-spacing: 2px; text-align: center; margin: 20px 0 8px; }
-    .ch2-big-timer.urgent { color: #e24b4a; }
-    .ch2-phase { background: #111; border: 0.5px solid #1e1e1e; border-radius: 14px; padding: 24px 20px; margin-top: 16px; }
-    .ch2-phase-title { font-size: 11px; color: #7ec8e3; letter-spacing: 2px; margin-bottom: 16px; }
-    .ch2-input { background: #0a0a0a; border: 1px solid #2a2a2a; border-radius: 10px; padding: 16px; font-size: 22px; font-weight: 700; letter-spacing: 4px; color: #f0f0f0; width: 100%; text-align: center; text-transform: uppercase; margin-bottom: 14px; }
-    .ch2-input:focus { outline: none; border-color: #c9a84c; }
-    .ch2-input::placeholder { color: #333; letter-spacing: 2px; font-size: 14px; }
-    .ch2-counter-row { display: flex; gap: 10px; margin-bottom: 14px; }
-    .ch2-counter-box { background: #0a0a0a; border: 0.5px solid #1e1e1e; border-radius: 10px; padding: 12px; flex: 1; text-align: center; }
-    .ch2-counter-val { font-size: 22px; font-weight: 700; color: #c9a84c; }
-    .ch2-counter-lbl { font-size: 9px; color: #444; letter-spacing: 1px; margin-top: 3px; }
-    .ch2-counter-val.negative { color: #e24b4a; }
-    .ch2-leftover-row { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 16px; }
-    .ch2-leftover-btn { width: 44px; height: 44px; border-radius: 50%; border: 1px solid #2a2a2a; background: #111; color: #f0f0f0; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .ch2-leftover-btn:hover { border-color: #c9a84c; }
-    .ch2-leftover-num { font-size: 32px; font-weight: 700; color: #c9a84c; min-width: 50px; text-align: center; }
-    .ch2-leftover-lbl { font-size: 10px; color: #444; letter-spacing: 1px; text-align: center; margin-bottom: 4px; }
-    .ch2-submitted-banner { background: #0d2a0d; border: 0.5px solid #1e3e1e; border-radius: 12px; padding: 20px; text-align: center; margin-top: 16px; }
+    .sub-meta { font-size: 11px; color: #555; text-align: center; margin-bottom: 10px; }
+    .sub-score { font-size: 14px; font-weight: 600; text-align: center; color: #c9a84c; margin-bottom: 14px; }
+    .sub-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .sub-approve { background: #0d1a0d; color: #4aaa6a; border: 1px solid #1a3a1a; border-radius: 10px; padding: 12px; font-size: 12px; font-weight: 600; letter-spacing: 1px; cursor: pointer; }
+    .sub-approve:hover { filter: brightness(1.2); }
+    .sub-reject { background: #1a0d0d; color: #e24b4a; border: 1px solid #3a1a1a; border-radius: 10px; padding: 12px; font-size: 12px; font-weight: 600; letter-spacing: 1px; cursor: pointer; }
+    .sub-reject:hover { filter: brightness(1.2); }
   </style>
 </head>
 <body>
 <div id="app">
-
   <!-- LOADING -->
   <div id="s-loading" class="screen active">
-    <div style="text-align:center;padding:100px 20px">
-      <div class="logo-mark" style="margin-bottom:8px">ASSASSIN</div>
-      <span class="logo-sub" style="display:block;text-align:center;margin-bottom:56px">OPERATIVE SELECTION</span>
-      <div id="load-dots" style="margin-bottom:18px"><span class="load-dot"></span><span class="load-dot"></span><span class="load-dot"></span></div>
-      <div id="load-msg" style="font-size:11px;color:#444;letter-spacing:2px">CONNECTING TO COMMAND...</div>
-      <div id="load-err" style="margin-top:28px;display:none">
-        <p style="color:#e24b4a;font-size:12px;margin-bottom:10px;letter-spacing:1px">CONNECTION FAILED</p>
-        <p style="color:#444;font-size:11px;margin-bottom:24px;line-height:1.8;max-width:280px;margin-left:auto;margin-right:auto" id="load-err-msg"></p>
-        <button class="ghost-btn" style="max-width:260px;margin:0 auto;display:block" onclick="useFallback()">CONTINUE WITH SAVED DATA</button>
+    <div style="text-align:center; padding-top:120px">
+      <div class="logo-mark">ASSASSIN<span class="logo-sub">SEASON ONE</span></div>
+      <div style="margin-top:60px">
+        <span class="load-dot"></span><span class="load-dot"></span><span class="load-dot"></span>
       </div>
+      <div class="sync-note" style="margin-top:20px">ESTABLISHING SECURE CONNECTION</div>
     </div>
   </div>
 
   <!-- LOGIN -->
   <div id="s-login" class="screen">
-    <div class="top-bar">
-      <div><div class="logo-mark">ASSASSIN</div><span class="logo-sub">OPERATIVE SELECTION</span></div>
-      <div style="font-size:10px;color:#222;letter-spacing:1px">SEASON 1</div>
+    <div style="text-align:center;margin-bottom:36px">
+      <div class="logo-mark">ASSASSIN<span class="logo-sub">SEASON ONE</span></div>
     </div>
-    <p class="section-label">SELECT YOUR OPERATIVE</p>
+    <div class="section-label">SELECT OPERATIVE</div>
     <div class="player-grid" id="login-grid"></div>
-    <div class="divider"></div>
-    <div class="sync-note" id="sync-time"></div>
-    <button class="ghost-btn" onclick="goProducerPin()">PRODUCTION ACCESS</button>
+    <button class="ghost-btn" onclick="showScreen('s-prod-pin')">PRODUCTION ACCESS</button>
   </div>
 
   <!-- PLAYER PIN -->
   <div id="s-pin" class="screen">
     <div class="top-bar">
       <button class="back-btn" onclick="showScreen('s-login')">← BACK</button>
-      <div style="font-size:10px;color:#444;letter-spacing:2px" id="pin-who"></div>
+      <div class="logo-mark" style="font-size:16px;letter-spacing:3px">ASSASSIN</div>
     </div>
-    <div style="text-align:center;padding:10px 0 24px">
-      <p style="font-size:13px;color:#555;letter-spacing:2px;margin-bottom:4px">ENTER ACCESS CODE</p>
-      <p style="font-size:11px;color:#333">4-digit operative PIN</p>
+    <div style="text-align:center;margin-bottom:30px">
+      <div style="font-size:13px;color:#f0f0f0;font-weight:600;letter-spacing:1px;margin-bottom:8px" id="pin-player-name">ALEX</div>
+      <div style="font-size:10px;color:#444;letter-spacing:2px">ENTER YOUR 4-DIGIT PIN</div>
     </div>
-    <div class="pin-dots" id="pin-dots"></div>
+    <div class="pin-dots">
+      <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+    </div>
     <div class="err" id="pin-err"></div>
-    <div class="pin-pad" style="margin-top:16px">
-      <div class="pin-key" onclick="pk('1')">1</div><div class="pin-key" onclick="pk('2')">2</div><div class="pin-key" onclick="pk('3')">3</div>
-      <div class="pin-key" onclick="pk('4')">4</div><div class="pin-key" onclick="pk('5')">5</div><div class="pin-key" onclick="pk('6')">6</div>
-      <div class="pin-key" onclick="pk('7')">7</div><div class="pin-key" onclick="pk('8')">8</div><div class="pin-key" onclick="pk('9')">9</div>
-      <div class="pin-key" onclick="pclr()" style="font-size:12px;color:#555">CLR</div>
-      <div class="pin-key" onclick="pk('0')">0</div>
-      <div class="pin-key" onclick="pbk()" style="font-size:16px;color:#777">⌫</div>
+    <div class="pin-pad">
+      <div class="pin-key" onclick="pinInput('1')">1</div>
+      <div class="pin-key" onclick="pinInput('2')">2</div>
+      <div class="pin-key" onclick="pinInput('3')">3</div>
+      <div class="pin-key" onclick="pinInput('4')">4</div>
+      <div class="pin-key" onclick="pinInput('5')">5</div>
+      <div class="pin-key" onclick="pinInput('6')">6</div>
+      <div class="pin-key" onclick="pinInput('7')">7</div>
+      <div class="pin-key" onclick="pinInput('8')">8</div>
+      <div class="pin-key" onclick="pinInput('9')">9</div>
+      <div class="pin-key" onclick="pinClear()" style="color:#e24b4a">✕</div>
+      <div class="pin-key" onclick="pinInput('0')">0</div>
+      <div class="pin-key" onclick="pinBack()" style="color:#c9a84c">←</div>
     </div>
   </div>
 
   <!-- PLAYER HUB -->
   <div id="s-player" class="screen">
     <div class="top-bar">
-      <div><div class="logo-mark" style="font-size:16px">ASSASSIN</div><div id="ph-name" style="font-size:11px;color:#555;margin-top:3px;letter-spacing:1px"></div></div>
-      <button class="back-btn" onclick="showScreen('s-login')">LOG OUT</button>
+      <button class="back-btn" onclick="logout()">← LOGOUT</button>
+      <div style="display:flex;align-items:center">
+        <div class="logo-mark" style="font-size:16px;letter-spacing:3px">ASSASSIN</div>
+        <button class="sync-btn" id="player-sync-btn" onclick="manualSync()">↻ SYNC</button>
+      </div>
+    </div>
+    <div id="player-duel-banner"></div>
+    <div style="margin-bottom:20px">
+      <div style="font-size:10px;color:#444;letter-spacing:2px;margin-bottom:8px">OPERATIVE</div>
+      <div style="font-size:24px;font-weight:600;color:#f0f0f0" id="player-name-display">ALEX</div>
     </div>
     <div class="stat-row">
-      <div class="stat-box"><div class="stat-val" id="ph-kills">0</div><div class="stat-lbl">KILLS</div></div>
-      <div class="stat-box"><div class="stat-val" id="ph-duels">0</div><div class="stat-lbl">DUELS</div></div>
-      <div class="stat-box"><div class="stat-val" id="ph-status-val" style="font-size:14px">ACTIVE</div><div class="stat-lbl">STATUS</div></div>
+      <div class="stat-box"><div class="stat-val" id="player-kills">0</div><div class="stat-lbl">KILLS</div></div>
+      <div class="stat-box"><div class="stat-val" id="player-duels">0</div><div class="stat-lbl">DUELS</div></div>
+      <div class="stat-box"><div class="stat-val" id="player-status">ACTIVE</div></div>
     </div>
-    <div id="ph-block-banner"></div>
     <div class="info-card">
-      <div class="info-label">ASSIGNED TARGET</div>
-      <div class="info-value" id="ph-target" style="color:#c9a84c">—</div>
+      <div class="info-label">CURRENT TARGET</div>
+      <div class="info-value" id="player-target">BRIAN</div>
     </div>
     <div class="divider"></div>
-    <p class="section-label">MISSIONS</p>
-    <div id="ph-challenges"></div>
+    <div class="section-label">ACTIVE MISSIONS</div>
+    <div class="ch-card" onclick="showScreen('s-ch1-rules')">
+      <div class="ch-num">MISSION 01</div>
+      <div class="ch-title">Toxic Transfer</div>
+      <div class="ch-sub">Stay Healthy</div>
+      <span class="status-pill pill-open">OPEN</span>
+    </div>
+    <div class="ch-card" onclick="showScreen('s-ch2-rules')">
+      <div class="ch-num">MISSION 02</div>
+      <div class="ch-title">Intel Scramble</div>
+      <div class="ch-sub">Sabotage or Secure</div>
+      <span class="status-pill pill-open">OPEN</span>
+    </div>
+    <div class="ch-card locked">
+      <div class="ch-num">MISSION 03</div>
+      <div class="ch-title">Coming Soon</div>
+      <span class="status-pill pill-locked">LOCKED</span>
+    </div>
+    <div class="ch-card locked">
+      <div class="ch-num">MISSION 04</div>
+      <div class="ch-title">Coming Soon</div>
+      <span class="status-pill pill-locked">LOCKED</span>
+    </div>
   </div>
 
   <!-- CHALLENGE 1 RULES -->
   <div id="s-ch1-rules" class="screen">
     <div class="top-bar">
       <button class="back-btn" onclick="showScreen('s-player')">← BACK</button>
-      <div style="font-size:10px;color:#c9a84c;letter-spacing:2px">MISSION 01</div>
+      <div style="display:flex;align-items:center">
+        <div class="logo-mark" style="font-size:16px;letter-spacing:3px">MISSION 01</div>
+        <button class="sync-btn" onclick="manualSync()">↻</button>
+      </div>
     </div>
     <div style="margin-bottom:24px">
-      <div style="font-size:22px;font-weight:700;letter-spacing:3px;color:#e24b4a;margin-bottom:4px">TOXIC TRANSFER</div>
-      <div style="font-size:11px;color:#4a9;letter-spacing:2px;margin-bottom:2px">STAY HEALTHY</div>
-      <div style="font-size:11px;color:#444;letter-spacing:2px">READ CAREFULLY BEFORE PROCEEDING</div>
+      <div style="font-size:20px;font-weight:600;margin-bottom:4px">Toxic Transfer</div>
+      <div style="font-size:13px;color:#7ec8e3;letter-spacing:1px">STAY HEALTHY</div>
     </div>
-    <div class="rule-card"><div class="rule-num">1</div><div class="rule-text">One player will randomly start as <strong>infected</strong> and cannot win this challenge.</div></div>
-    <div class="rule-card"><div class="rule-num">2</div><div class="rule-text">Every <strong>30 seconds</strong>, you must pair up with another player by holding hands or tagging them. You cannot pair with the same person twice.</div></div>
-    <div class="rule-card"><div class="rule-num">3</div><div class="rule-text">If you pair with an <strong>infected player</strong>, you become infected. The infection spreads silently.</div></div>
-    <div class="rule-card"><div class="rule-num">4</div><div class="rule-text">Your status is only <strong>revealed every 2 rounds</strong>. You won't know you've been infected until the reveal.</div></div>
-    <div class="rule-card"><div class="rule-num">5</div><div class="rule-text">The last player left <strong>uninfected</strong> wins and puts their target up for elimination.</div></div>
-    <button class="gold-btn" onclick="enterCh1Field()">ENTER THE FIELD</button>
+    <div style="font-size:13px;line-height:1.7;color:#999;margin-bottom:20px">
+      One operative starts infected. Physical contact spreads the infection. Every two rounds, your status is revealed for 10 seconds. Stay healthy to survive this mission.
+    </div>
+    <button class="gold-btn" onclick="showScreen('s-ch1-status')">ENTER MISSION</button>
   </div>
 
   <!-- CHALLENGE 1 STATUS -->
-  <div id="s-ch1-status" class="screen" style="padding:0;position:relative">
-    <div style="position:absolute;top:20px;left:20px;z-index:10">
-      <button class="back-btn" onclick="leaveCh1()">← EXIT</button>
+  <div id="s-ch1-status" class="screen">
+    <div class="top-bar">
+      <button class="back-btn" onclick="showScreen('s-ch1-rules')">← EXIT</button>
+      <div style="display:flex;align-items:center">
+        <div class="logo-mark" style="font-size:16px;letter-spacing:3px">MISSION 01</div>
+        <button class="sync-btn" onclick="manualSync()">↻</button>
+      </div>
     </div>
-    <div class="ch1-status-wrap" id="ch1-status-wrap"></div>
+    <div class="timer-ring-container">
+      <svg class="timer-ring" width="200" height="200">
+        <circle class="timer-circle-bg" cx="100" cy="100" r="90"></circle>
+        <circle class="timer-circle-fg" id="ch1-timer-circle" cx="100" cy="100" r="90" stroke-dasharray="565.48" stroke-dashoffset="0"></circle>
+      </svg>
+      <div class="timer-text" id="ch1-timer-text">--</div>
+    </div>
+    <div id="ch1-status-card-container"></div>
   </div>
 
   <!-- CHALLENGE 2 RULES -->
   <div id="s-ch2-rules" class="screen">
     <div class="top-bar">
       <button class="back-btn" onclick="showScreen('s-player')">← BACK</button>
-      <div style="font-size:10px;color:#7ec8e3;letter-spacing:2px">MISSION 02</div>
+      <div style="display:flex;align-items:center">
+        <div class="logo-mark" style="font-size:16px;letter-spacing:3px">MISSION 02</div>
+        <button class="sync-btn" onclick="manualSync()">↻</button>
+      </div>
     </div>
     <div style="margin-bottom:24px">
-      <div style="font-size:22px;font-weight:700;letter-spacing:3px;color:#7ec8e3;margin-bottom:4px">INTEL SCRAMBLE</div>
-      <div style="font-size:11px;color:#c9a84c;letter-spacing:2px;margin-bottom:2px">SABOTAGE OR SECURE</div>
-      <div style="font-size:11px;color:#444;letter-spacing:2px">READ CAREFULLY BEFORE PROCEEDING</div>
+      <div style="font-size:20px;font-weight:600;margin-bottom:4px">Intel Scramble</div>
+      <div style="font-size:13px;color:#7ec8e3;letter-spacing:1px">SABOTAGE OR SECURE</div>
     </div>
-    <div class="rule-card"><div class="rule-num">1</div><div class="rule-text">Race across the room to collect <strong>one letter tile</strong> at a time and bring it back.</div></div>
-    <div class="rule-card"><div class="rule-num">2</div><div class="rule-text">Place the letter in <strong>your own cup</strong> to secure it, or drop it in <strong>another player's cup</strong> to sabotage them — or help an ally.</div></div>
-    <div class="rule-card"><div class="rule-num">3</div><div class="rule-text">After <strong>3 minutes</strong> all players stop. You then have <strong>1 minute 30 seconds</strong> to form the longest word possible and submit it below.</div></div>
-    <div class="rule-card"><div class="rule-num">4</div><div class="rule-text">Scoring: each letter in your word = <strong>+2 points</strong>. Each unused tile = <strong>-1 point</strong>.</div></div>
-    <div class="rule-card"><div class="rule-num">5</div><div class="rule-text">Only collect what you need — extra tiles count against you. <strong>Top score wins</strong> and puts their target up for elimination.</div></div>
-    <button class="gold-btn" onclick="enterCh2()">ENTER THE FIELD</button>
+    <div style="font-size:13px;line-height:1.7;color:#999;margin-bottom:20px">
+      When the collection phase begins, grab letter tiles. Place them in your cup to secure intel, or sabotage others by placing tiles in their cups. After collection ends, make the longest word you can. Your score: (word length × 2) − unused tiles.
+    </div>
+    <button class="gold-btn" onclick="showScreen('s-ch2-play')">ENTER MISSION</button>
   </div>
 
   <!-- CHALLENGE 2 PLAY -->
   <div id="s-ch2-play" class="screen">
     <div class="top-bar">
-      <button class="back-btn" onclick="leaveCh2()">← EXIT</button>
-      <div style="font-size:10px;color:#7ec8e3;letter-spacing:2px">INTEL SCRAMBLE</div>
+      <button class="back-btn" onclick="showScreen('s-ch2-rules')">← EXIT</button>
+      <div style="display:flex;align-items:center">
+        <div class="logo-mark" style="font-size:16px;letter-spacing:3px">MISSION 02</div>
+        <button class="sync-btn" onclick="manualSync()">↻</button>
+      </div>
     </div>
-    <div id="ch2-player-content"></div>
+    <div id="ch2-player-view"></div>
   </div>
 
   <!-- PRODUCER PIN -->
   <div id="s-prod-pin" class="screen">
     <div class="top-bar">
       <button class="back-btn" onclick="showScreen('s-login')">← BACK</button>
-      <div style="font-size:10px;color:#444;letter-spacing:2px">PRODUCTION</div>
+      <div class="logo-mark" style="font-size:16px;letter-spacing:3px">ASSASSIN</div>
     </div>
-    <div style="text-align:center;padding:10px 0 24px">
-      <p style="font-size:13px;color:#555;letter-spacing:2px;margin-bottom:4px">PRODUCTION ACCESS</p>
-      <p style="font-size:11px;color:#333">Enter producer password</p>
+    <div style="text-align:center;margin-bottom:30px">
+      <div style="font-size:13px;color:#f0f0f0;font-weight:600;letter-spacing:1px;margin-bottom:8px">PRODUCTION ACCESS</div>
+      <div style="font-size:10px;color:#444;letter-spacing:2px">ENTER PRODUCER PIN</div>
     </div>
-    <div class="pin-dots" id="prod-dots"></div>
-    <div class="err" id="prod-err"></div>
-    <div class="pin-pad" style="margin-top:16px">
-      <div class="pin-key" onclick="ppk('1')">1</div><div class="pin-key" onclick="ppk('2')">2</div><div class="pin-key" onclick="ppk('3')">3</div>
-      <div class="pin-key" onclick="ppk('4')">4</div><div class="pin-key" onclick="ppk('5')">5</div><div class="pin-key" onclick="ppk('6')">6</div>
-      <div class="pin-key" onclick="ppk('7')">7</div><div class="pin-key" onclick="ppk('8')">8</div><div class="pin-key" onclick="ppk('9')">9</div>
-      <div class="pin-key" onclick="ppclr()" style="font-size:12px;color:#555">CLR</div>
-      <div class="pin-key" onclick="ppk('0')">0</div>
-      <div class="pin-key" onclick="ppbk()" style="font-size:16px;color:#777">⌫</div>
+    <div class="pin-dots">
+      <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+    </div>
+    <div class="err" id="prod-pin-err"></div>
+    <div class="pin-pad">
+      <div class="pin-key" onclick="prodPinInput('1')">1</div>
+      <div class="pin-key" onclick="prodPinInput('2')">2</div>
+      <div class="pin-key" onclick="prodPinInput('3')">3</div>
+      <div class="pin-key" onclick="prodPinInput('4')">4</div>
+      <div class="pin-key" onclick="prodPinInput('5')">5</div>
+      <div class="pin-key" onclick="prodPinInput('6')">6</div>
+      <div class="pin-key" onclick="prodPinInput('7')">7</div>
+      <div class="pin-key" onclick="prodPinInput('8')">8</div>
+      <div class="pin-key" onclick="prodPinInput('9')">9</div>
+      <div class="pin-key" onclick="prodPinClear()" style="color:#e24b4a">✕</div>
+      <div class="pin-key" onclick="prodPinInput('0')">0</div>
+      <div class="pin-key" onclick="prodPinBack()" style="color:#c9a84c">←</div>
     </div>
   </div>
 
   <!-- PRODUCER HOME -->
   <div id="s-prod-home" class="screen">
     <div class="top-bar">
-      <div><div class="logo-mark" style="font-size:16px">ASSASSIN</div><span class="logo-sub">PRODUCTION</span></div>
-      <button class="back-btn" onclick="showScreen('s-login')">EXIT</button>
+      <button class="back-btn" onclick="logout()">← LOGOUT</button>
+      <div class="logo-mark" style="font-size:16px;letter-spacing:3px">PRODUCTION</div>
     </div>
+    <div class="section-label">PRODUCER CONTROLS</div>
     <div class="prod-nav">
-      <div class="prod-nav-tile roster-tile" onclick="loadProdRoster()">
-        <div class="prod-nav-icon" style="color:#c9a84c">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/></svg>
-        </div>
+      <div class="prod-nav-tile roster-tile" onclick="showScreen('s-prod-roster')">
+        <div class="prod-nav-icon">👥</div>
         <div class="prod-nav-label">ROSTER</div>
-        <div class="prod-nav-sub">Targets, kills, blocks</div>
+        <div class="prod-nav-sub">Operative status</div>
       </div>
       <div class="prod-nav-tile challenges-tile" onclick="showScreen('s-prod-challenges')">
-        <div class="prod-nav-icon" style="color:#7ec8e3">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        </div>
+        <div class="prod-nav-icon">🎯</div>
         <div class="prod-nav-label">CHALLENGES</div>
-        <div class="prod-nav-sub">Run missions live</div>
+        <div class="prod-nav-sub">Mission control</div>
       </div>
     </div>
-    <div class="divider"></div>
-    <div id="prod-home-block-section" style="display:none;margin-top:16px">
-      <div class="on-block">
-        <div class="on-block-title">CURRENTLY UP FOR ELIMINATION</div>
-        <div class="duel-names" id="prod-home-duel-names"></div>
-      </div>
-    </div>
-    <button class="back-btn" style="width:100%;margin-top:8px;color:#7ec8e3;border-color:#1a3a4a;padding:10px" onclick="reloadFromSheets()">↺ SYNC FROM SHEETS</button>
-    <div class="sync-note" id="prod-sync-time" style="margin-top:8px"></div>
   </div>
 
   <!-- PRODUCER ROSTER -->
   <div id="s-prod-roster" class="screen">
     <div class="top-bar">
       <button class="back-btn" onclick="showScreen('s-prod-home')">← BACK</button>
-      <div style="font-size:10px;color:#c9a84c;letter-spacing:2px">OPERATIVE ROSTER</div>
+      <div class="logo-mark" style="font-size:16px;letter-spacing:3px">ROSTER</div>
     </div>
-    <div id="prod-roster"></div>
+    <div class="section-label">OPERATIVE STATUS</div>
+    <div id="prod-roster-list"></div>
     <div class="save-indicator" id="save-indicator"></div>
   </div>
 
@@ -392,483 +427,524 @@
   <div id="s-prod-challenges" class="screen">
     <div class="top-bar">
       <button class="back-btn" onclick="showScreen('s-prod-home')">← BACK</button>
-      <div style="font-size:10px;color:#7ec8e3;letter-spacing:2px">MISSIONS</div>
+      <div class="logo-mark" style="font-size:16px;letter-spacing:3px">CHALLENGES</div>
     </div>
-    <p class="section-label">SELECT A MISSION TO CONTROL</p>
-    <div class="challenge-hub-card" onclick="showScreen('s-prod-ch1')">
-      <div class="challenge-hub-num">01</div>
-      <div class="challenge-hub-info">
-        <div class="challenge-hub-title">Toxic Transfer</div>
-        <div class="challenge-hub-sub">Stay healthy</div>
-        <span class="challenge-hub-badge" id="ch1-hub-badge" style="background:#111;color:#444;border:0.5px solid #222">IDLE</span>
+    <div class="section-label">MISSION CONTROL</div>
+    <div class="ch-hub-card" onclick="showScreen('s-prod-ch1')">
+      <div class="ch-hub-header">
+        <div class="ch-hub-num">MISSION 01</div>
+        <div class="ch-hub-badge badge-idle" id="ch1-hub-badge">IDLE</div>
       </div>
-      <div class="challenge-hub-arrow">›</div>
+      <div class="ch-hub-title">Toxic Transfer</div>
+      <div class="ch-hub-sub">Stay Healthy</div>
     </div>
-    <div class="challenge-hub-card" onclick="showScreen('s-prod-ch2')">
-      <div class="challenge-hub-num">02</div>
-      <div class="challenge-hub-info">
-        <div class="challenge-hub-title">Intel Scramble</div>
-        <div class="challenge-hub-sub">Sabotage or Secure</div>
-        <span class="challenge-hub-badge" id="ch2-hub-badge" style="background:#111;color:#444;border:0.5px solid #222">IDLE</span>
+    <div class="ch-hub-card" onclick="showScreen('s-prod-ch2')">
+      <div class="ch-hub-header">
+        <div class="ch-hub-num">MISSION 02</div>
+        <div class="ch-hub-badge badge-idle" id="ch2-hub-badge">IDLE</div>
       </div>
-      <div class="challenge-hub-arrow">›</div>
+      <div class="ch-hub-title">Intel Scramble</div>
+      <div class="ch-hub-sub">Sabotage or Secure</div>
     </div>
-    <div class="challenge-hub-card" style="opacity:0.4;cursor:default">
-      <div class="challenge-hub-num" style="color:#444">03</div>
-      <div class="challenge-hub-info">
-        <div class="challenge-hub-title" style="color:#555">Coming Soon</div>
-        <div class="challenge-hub-sub">Not yet built</div>
+    <div class="ch-hub-card locked">
+      <div class="ch-hub-header">
+        <div class="ch-hub-num">MISSION 03</div>
+        <div class="ch-hub-badge badge-locked">LOCKED</div>
       </div>
-      <div class="challenge-hub-arrow" style="color:#222">›</div>
+      <div class="ch-hub-title">Coming Soon</div>
     </div>
-    <div class="challenge-hub-card" style="opacity:0.4;cursor:default">
-      <div class="challenge-hub-num" style="color:#444">04</div>
-      <div class="challenge-hub-info">
-        <div class="challenge-hub-title" style="color:#555">Coming Soon</div>
-        <div class="challenge-hub-sub">Not yet built</div>
+    <div class="ch-hub-card locked">
+      <div class="ch-hub-header">
+        <div class="ch-hub-num">MISSION 04</div>
+        <div class="ch-hub-badge badge-locked">LOCKED</div>
       </div>
-      <div class="challenge-hub-arrow" style="color:#222">›</div>
+      <div class="ch-hub-title">Coming Soon</div>
     </div>
   </div>
 
-  <!-- PRODUCER CH1 CONTROLS -->
+  <!-- PRODUCER CHALLENGE 1 -->
   <div id="s-prod-ch1" class="screen">
     <div class="top-bar">
       <button class="back-btn" onclick="showScreen('s-prod-challenges')">← BACK</button>
-      <div style="font-size:10px;color:#e24b4a;letter-spacing:2px">TOXIC TRANSFER</div>
+      <div class="logo-mark" style="font-size:16px;letter-spacing:3px">MISSION 01</div>
     </div>
-    <div class="ch-control-wrap">
-      <div class="ch-control-title">ROUND CONTROLS</div>
-      <div class="ch-info-row">
-        <div class="ch-info-box"><div class="ch-info-val" id="prod-round">0</div><div class="ch-info-lbl">ROUND</div></div>
-        <div class="ch-info-box"><div class="ch-info-val" id="prod-timer-display">30</div><div class="ch-info-lbl">SECONDS</div></div>
-        <div class="ch-info-box"><div class="ch-info-val" id="prod-infected-count">0</div><div class="ch-info-lbl">INFECTED</div></div>
-      </div>
-      <button class="ch-btn ch-btn-green" id="prod-start-btn" onclick="prodToggleTimer()">START ROUND</button>
-      <div class="ch-btn-grid">
-        <button class="ch-btn ch-btn-gold" onclick="prodTriggerReveal()">REVEAL STATUS</button>
-        <button class="ch-btn ch-btn-blue" onclick="prodNextRound()">NEXT ROUND</button>
-      </div>
-      <div style="font-size:10px;color:#2a2a2a;letter-spacing:1px;margin-top:8px;text-align:center" id="prod-ch1-status-msg">Ready to start</div>
+    <div style="margin-bottom:20px">
+      <div style="font-size:18px;font-weight:600;margin-bottom:4px">Toxic Transfer</div>
+      <div style="font-size:11px;color:#7ec8e3;letter-spacing:1px">PRODUCER CONTROLS</div>
+    </div>
+    <div class="prod-round-info">
+      <div class="prod-round-num" id="prod-ch1-round">ROUND 0</div>
+      <div class="prod-round-lbl">CURRENT ROUND</div>
+    </div>
+    <div class="prod-timer-big" id="prod-ch1-timer">--</div>
+    <div class="prod-controls">
+      <button class="prod-btn prod-btn-start" id="prod-ch1-start-btn" onclick="prodCh1ToggleTimer()">START ROUND</button>
+      <button class="prod-btn prod-btn-pause" id="prod-ch1-pause-btn" onclick="prodCh1Pause()" disabled>PAUSE</button>
+      <button class="prod-btn prod-btn-reveal" onclick="prodCh1Reveal()">REVEAL STATUS</button>
+      <button class="prod-btn prod-btn-next" onclick="prodCh1NextRound()">NEXT ROUND</button>
     </div>
     <div class="divider"></div>
-    <p class="section-label">MARK INFECTION STATUS</p>
+    <div class="section-label">INFECTION ROSTER <span id="prod-infected-count" style="color:#e24b4a">0</span> INFECTED</div>
     <div id="prod-ch1-roster"></div>
   </div>
 
-  <!-- PRODUCER CH2 CONTROLS -->
+  <!-- PRODUCER CHALLENGE 2 -->
   <div id="s-prod-ch2" class="screen">
     <div class="top-bar">
       <button class="back-btn" onclick="showScreen('s-prod-challenges')">← BACK</button>
-      <div style="font-size:10px;color:#7ec8e3;letter-spacing:2px">INTEL SCRAMBLE</div>
+      <div class="logo-mark" style="font-size:16px;letter-spacing:3px">MISSION 02</div>
     </div>
-    <div class="ch-control-wrap" style="border-color:#7ec8e333">
-      <div class="ch-control-title" style="color:#7ec8e3">COLLECTION TIMER</div>
-      <div class="ch2-timer-big" id="prod-ch2-timer">3:00</div>
-      <div class="ch2-timer-lbl" id="prod-ch2-phase-lbl">COLLECTION PHASE</div>
-      <button class="ch-btn ch-btn-blue" id="prod-ch2-start-btn" onclick="prodCh2ToggleTimer()">START COLLECTION</button>
-      <button class="ch-btn ch-btn-gray" onclick="prodCh2Reset()">RESET TIMER</button>
-      <div style="font-size:10px;color:#2a2a2a;letter-spacing:1px;margin-top:4px;text-align:center" id="prod-ch2-msg">Ready to start collection phase</div>
+    <div style="margin-bottom:20px">
+      <div style="font-size:18px;font-weight:600;margin-bottom:4px">Intel Scramble</div>
+      <div style="font-size:11px;color:#7ec8e3;letter-spacing:1px">PRODUCER CONTROLS</div>
+    </div>
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:11px;color:#444;letter-spacing:2px;margin-bottom:6px" id="prod-ch2-phase-lbl">COLLECTION PHASE</div>
+      <div style="font-size:48px;font-weight:600;color:#c9a84c" id="prod-ch2-timer">3:00</div>
+      <div style="font-size:12px;color:#555;margin-top:8px" id="prod-ch2-msg">Ready to start collection</div>
+    </div>
+    <div class="prod-controls">
+      <button class="prod-btn prod-btn-start" id="prod-ch2-start-btn" onclick="prodCh2ToggleTimer()">START COLLECTION</button>
+      <button class="prod-btn prod-btn-pause" onclick="prodCh2Reset()">RESET</button>
     </div>
     <div class="divider"></div>
-    <p class="section-label">WORD SUBMISSIONS</p>
-    <div id="prod-ch2-submissions"><div style="font-size:11px;color:#2a2a2a;letter-spacing:1px;text-align:center;padding:16px 0">No submissions yet</div></div>
+    <div class="section-label">WORD SUBMISSIONS</div>
+    <div id="prod-ch2-submissions"></div>
   </div>
-
 </div>
+
 <script>
-  const SHEET_URL  = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQiECxwEoh8PmCak-cDKtP6jMpWZHEHo-12WudRGjgLLP4TgP2v0D7UKT5zNmWkdlIlNmj3-J62MRV7/pub?gid=0&single=true&output=csv";
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxPL3lLMx6RFNperVracBSm9mgMih-qWKsGNCvGjq136kbpG4tFysIgJzRbknI4jS3Z/exec";
-  const PROD_PIN = "0000";
-  const ROUND_SECS = 30;
-  const CH2_COLLECT_SECS = 180;
+  const SHEET_CSV='https://docs.google.com/spreadsheets/d/e/2PACX-1vQiECxwEoh8PmCak-cDKtP6jMpWZHEHo-12WudRGjgLLP4TgP2v0D7UKT5zNmWkdlIlNmj3-J62MRV7/pub?gid=0&single=true&output=csv';
+  const SCRIPT_URL='https://script.google.com/macros/s/AKfycbwqRbRcMAW9IOrvAhghj2CpEM4ZiyILlT7gADmHaI0Qv4j81ZVyC15L72f0AvVbvsjg/exec';
+  const CORS_PROXIES=['https://corsproxy.io/?','https://api.allorigins.win/raw?url=','https://cors-anywhere.herokuapp.com/'];
+  
+  const CH1_ROUND_SECS=30;
+  const CH2_COLLECT_SECS=180;
+  
+  let players=[];
+  let currentPlayer=null;
+  let pinAttempt='';
+  let prodPinAttempt='';
+  
+  let gameState={
+    ch1_round:0,
+    ch1_revealed:false,
+    ch1_running:false,
+    ch2_phase:'idle'
+  };
+  
+  let ch1State={round:0,seconds:CH1_ROUND_SECS,intervalId:null,revealed:false};
+  let ch2State={phase:'idle',seconds:CH2_COLLECT_SECS,intervalId:null,submissions:{}};
+  let ch2Player={word:'',leftover:0,submitted:false};
+  
+  let gameStatePollInterval=null;
 
-  const challenges = [
-    { id:1, title:"Toxic Transfer",  sub:"Stay healthy",        open:true  },
-    { id:2, title:"Intel Scramble",  sub:"Sabotage or Secure",  open:true  },
-    { id:3, title:"Mission 03",      sub:"Coming soon",         open:false },
-    { id:4, title:"Mission 04",      sub:"Coming soon",         open:false }
-  ];
-
-  let players = [], currentPlayer = null, pinBuf = "", prodBuf = "", lastSync = null;
-
-  let ch1State = { running:false, seconds:ROUND_SECS, round:0, revealed:false, revealTimer:null, intervalId:null, pollId:null };
-  let ch2State = { phase:'idle', seconds:CH2_COLLECT_SECS, intervalId:null, playerPollId:null, submissions:{} };
-  let ch2Player = { word:'', leftover:0, submitted:false };
-
-  const fallback = [
-    {name:"Alex",    pin:"1111", target:"Brian",   originalTarget:"Brian",   kills:0, duels:0, status:"Active", onBlock:false, infected:false},
-    {name:"Brian",   pin:"2222", target:"Cass",    originalTarget:"Cass",    kills:0, duels:0, status:"Active", onBlock:false, infected:false},
-    {name:"Cass",    pin:"3333", target:"Danny",   originalTarget:"Danny",   kills:0, duels:0, status:"Active", onBlock:false, infected:false},
-    {name:"Danny",   pin:"4444", target:"Edgar",   originalTarget:"Edgar",   kills:0, duels:0, status:"Active", onBlock:false, infected:false},
-    {name:"Edgar",   pin:"5555", target:"Frannie", originalTarget:"Frannie", kills:0, duels:0, status:"Active", onBlock:false, infected:false},
-    {name:"Frannie", pin:"6666", target:"Goose",   originalTarget:"Goose",   kills:0, duels:0, status:"Active", onBlock:false, infected:false},
-    {name:"Goose",   pin:"7777", target:"Hailey",  originalTarget:"Hailey",  kills:0, duels:0, status:"Active", onBlock:false, infected:false},
-    {name:"Hailey",  pin:"8888", target:"Irena",   originalTarget:"Irena",   kills:0, duels:0, status:"Active", onBlock:false, infected:false},
-    {name:"Irena",   pin:"9999", target:"Jack",    originalTarget:"Jack",    kills:0, duels:0, status:"Active", onBlock:false, infected:false},
-    {name:"Jack",    pin:"1010", target:"Kate",    originalTarget:"Kate",    kills:0, duels:0, status:"Active", onBlock:false, infected:false},
-    {name:"Kate",    pin:"1212", target:"Lucy",    originalTarget:"Lucy",    kills:0, duels:0, status:"Active", onBlock:false, infected:false},
-    {name:"Lucy",    pin:"1313", target:"Alex",    originalTarget:"Alex",    kills:0, duels:0, status:"Active", onBlock:false, infected:false}
-  ];
-
-  function parseCSV(text) {
-    return text.trim().split('\n').slice(1).map(row => {
-      const c = row.split(',').map(s => s.trim().replace(/^"|"$/g,''));
-      return { name:c[0]||'', pin:String(c[1]||'0000'), target:c[2]||'', originalTarget:c[2]||'', kills:parseInt(c[3])||0, duels:parseInt(c[4])||0, status:c[5]||'Active', onBlock:(c[6]||'').toLowerCase()==='true', infected:(c[7]||'').toLowerCase()==='true' };
-    }).filter(p => p.name && p.name !== 'Player');
-  }
-
-  function fetchWithTimeout(url, ms) {
-    return Promise.race([fetch(url), new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),ms))]);
-  }
-
-  async function tryFetch() {
-    const proxies=[u=>`https://corsproxy.io/?${encodeURIComponent(u)}`,u=>`https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,u=>`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`];
-    for (let i=0;i<proxies.length;i++) {
-      setMsg('TRYING CONNECTION '+(i+1)+' OF '+proxies.length+'...');
-      try {
-        const res=await fetchWithTimeout(proxies[i](SHEET_URL),7000);
-        if(!res.ok)continue;
-        const text=await res.text();
-        if(!text||text.trim().length<10)continue;
-        const parsed=parseCSV(text);
-        if(parsed.length>0)return parsed;
-      }catch(e){continue;}
-    }
-    throw new Error('all proxies failed');
-  }
-
-  async function savePlayer(player) {
-    try {
-      await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:player.name,target:player.target,kills:player.kills,duels:player.duels,status:player.status,onBlock:player.onBlock,infected:player.infected})});
-      showSaveMsg('SAVED TO SHEET','#4aaa6a');
-    }catch(e){showSaveMsg('SAVE FAILED','#e24b4a');}
-  }
-
-  async function saveSubmission(name,word,leftover,score) {
-    try { await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'ch2submission',name,word,leftover,score})}); }catch(e){}
-  }
-
-  function showSaveMsg(msg,color) {
-    const el=document.getElementById('save-indicator');
-    if(!el)return;
-    el.textContent=msg;el.style.color=color;el.style.opacity='1';
-    setTimeout(()=>{el.style.opacity='0';},3000);
-  }
-
-  function setMsg(m){const el=document.getElementById('load-msg');if(el)el.textContent=m;}
-
-  async function loadFromSheets() {
-    try {
-      players=await tryFetch();lastSync=new Date();
-      renderLoginGrid();showScreen('s-login');updateSyncNote();
-    }catch(e){
-      document.getElementById('load-dots').style.display='none';
-      document.getElementById('load-msg').style.display='none';
-      document.getElementById('load-err-msg').textContent='Could not reach Google Sheets. Continue with saved data.';
-      document.getElementById('load-err').style.display='block';
-    }
-  }
-
-  function useFallback(){players=fallback.map(p=>({...p}));renderLoginGrid();showScreen('s-login');document.getElementById('sync-time').textContent='OFFLINE — USING SAVED DATA';}
-
-  async function reloadFromSheets(){
-    try{
-      const fresh=await tryFetch();
-      fresh.forEach(fp=>{const ex=players.find(p=>p.name===fp.name);if(ex){fp.onBlock=ex.onBlock;fp.originalTarget=ex.originalTarget||fp.target;}});
-      players=fresh;lastSync=new Date();updateSyncNote();
-      loadProdHome();
-    }catch(e){alert('Could not reach Google Sheets.');}
-  }
-
-  function updateSyncNote(){
-    const t=lastSync?'LIVE — SYNCED '+lastSync.toLocaleTimeString():'OFFLINE — SAVED DATA';
-    ['sync-time','prod-sync-time'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=t;});
-  }
-
+  /* ── UTILS ── */
   function showScreen(id){
     document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
-    window.scrollTo(0,0);
+    if(id==='s-player')loadPlayerHub();
+    if(id==='s-prod-roster')loadProdRoster();
+    if(id==='s-prod-challenges')updateChallengeBadges();
+    if(id==='s-prod-ch1'){
+      document.getElementById('prod-infected-count').textContent=players.filter(p=>p.infected&&p.status!=='Eliminated').length;
+      renderCh1ProdRoster();
+    }
+    if(id==='s-ch1-status')renderCh1PlayerView();
+    if(id==='s-ch2-play')renderCh2PlayerView();
+    if(id==='s-prod-ch2')renderCh2ProdSubmissions();
   }
 
+  function logout(){
+    currentPlayer=null;pinAttempt='';prodPinAttempt='';
+    stopGameStatePolling();
+    showScreen('s-login');
+  }
+
+  async function showSaveMsg(msg,color='#c9a84c'){
+    const el=document.getElementById('save-indicator');if(!el)return;
+    el.textContent=msg;el.style.color=color;el.style.opacity='1';
+    await new Promise(r=>setTimeout(r,1500));
+    el.style.opacity='0';
+  }
+
+  /* ── GAMESTATE POLLING ── */
+  function startGameStatePolling(){
+    if(gameStatePollInterval)return;
+    gameStatePollInterval=setInterval(async()=>{
+      await fetchGameState();
+    },5000);
+  }
+
+  function stopGameStatePolling(){
+    if(gameStatePollInterval){
+      clearInterval(gameStatePollInterval);
+      gameStatePollInterval=null;
+    }
+  }
+
+  async function fetchGameState(){
+    // Fetch GameState sheet via CSV (columns: Key, Value)
+    // GameState tab should be published as CSV at same URL with gid parameter
+    const gameStateCSV='https://docs.google.com/spreadsheets/d/e/2PACX-1vQiECxwEoh8PmCak-cDKtP6jMpWZHEHo-12WudRGjgLLP4TgP2v0D7UKT5zNmWkdlIlNmj3-J62MRV7/pub?gid=574646101&single=true&output=csv';
+    
+    for(const proxy of CORS_PROXIES){
+      try{
+        const res=await fetch(proxy+encodeURIComponent(gameStateCSV));
+        if(!res.ok)continue;
+        const csv=await res.text();
+        parseGameStateCSV(csv);
+        updateUIFromGameState();
+        return;
+      }catch(e){continue;}
+    }
+  }
+
+  function parseGameStateCSV(csv){
+    const lines=csv.trim().split('\n').slice(1);
+    lines.forEach(line=>{
+      const [key,value]=line.split(',').map(s=>s.replace(/"/g,'').trim());
+      if(key==='ch1_round')gameState.ch1_round=parseInt(value)||0;
+      if(key==='ch1_revealed')gameState.ch1_revealed=value==='TRUE';
+      if(key==='ch1_running')gameState.ch1_running=value==='TRUE';
+      if(key==='ch2_phase')gameState.ch2_phase=value||'idle';
+    });
+  }
+
+  function updateUIFromGameState(){
+    // Update challenge badges
+    updateChallengeBadges();
+    
+    // Update Challenge 1 player view
+    const ch1Screen=document.getElementById('s-ch1-status');
+    if(ch1Screen&&ch1Screen.classList.contains('active')){
+      renderCh1PlayerView();
+    }
+    
+    // Update Challenge 2 player view
+    const ch2Screen=document.getElementById('s-ch2-play');
+    if(ch2Screen&&ch2Screen.classList.contains('active')){
+      renderCh2PlayerView();
+    }
+  }
+
+  async function writeGameState(key,value){
+    try{
+      await fetch(SCRIPT_URL,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({action:'gamestate',key,value})
+      });
+    }catch(e){console.error('writeGameState error:',e);}
+  }
+
+  async function manualSync(){
+    const btn=document.querySelector('.sync-btn');
+    if(btn)btn.classList.add('syncing');
+    await Promise.all([loadFromSheets(),fetchGameState()]);
+    if(currentPlayer)loadPlayerHub();
+    if(btn){
+      btn.classList.remove('syncing');
+      setTimeout(()=>btn.blur(),200);
+    }
+  }
+
+  /* ── LOAD FROM SHEETS ── */
+  async function loadFromSheets(){
+    for(const proxy of CORS_PROXIES){
+      try{
+        const res=await fetch(proxy+encodeURIComponent(SHEET_CSV));
+        if(!res.ok)continue;
+        const csv=await res.text();
+        parseCSV(csv);
+        renderLoginGrid();
+        showScreen('s-login');
+        startGameStatePolling();
+        return;
+      }catch(e){continue;}
+    }
+    alert('Failed to connect to Google Sheets');
+  }
+
+  function parseCSV(csv){
+    const lines=csv.trim().split('\n').slice(1);
+    players=lines.map(line=>{
+      const cols=line.split(',').map(s=>s.replace(/"/g,'').trim());
+      return{
+        name:cols[0],pin:cols[1],target:cols[2],originalTarget:cols[2],
+        kills:parseInt(cols[3])||0,duels:parseInt(cols[4])||0,status:cols[5]||'Active',
+        onBlock:cols[6]==='TRUE',infected:cols[7]==='TRUE'
+      };
+    });
+  }
+
+  async function savePlayer(p){
+    try{
+      await fetch(SCRIPT_URL,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          name:p.name,target:p.target,kills:p.kills,duels:p.duels,
+          status:p.status,onBlock:p.onBlock,infected:p.infected
+        })
+      });
+    }catch(e){console.error('savePlayer error:',e);}
+  }
+
+  async function saveSubmission(name,word,leftover,score){
+    try{
+      await fetch(SCRIPT_URL,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({action:'ch2submission',name,word,score})
+      });
+    }catch(e){console.error('saveSubmission error:',e);}
+  }
+
+  /* ── LOGIN ── */
   function renderLoginGrid(){
-    document.getElementById('login-grid').innerHTML=players.map((p,i)=>{
-      const elim=p.status==='Eliminated';
-      return `<div class="player-btn" onclick="selectPlayer(${i})" style="${elim?'opacity:0.4':''}">
-        <div class="initials${elim?' elim':''}">${p.name.slice(0,2).toUpperCase()}</div>
-        <div class="pname">${p.name}${elim?'<span class="elim-x">OUT</span>':''}</div>
+    const grid=document.getElementById('login-grid');
+    grid.innerHTML=players.map(p=>{
+      const initials=p.name.split(' ').map(w=>w[0]).join('').toUpperCase();
+      const isElim=p.status==='Eliminated';
+      return`<div class="player-btn" onclick="selectPlayer('${p.name}')">
+        <div class="initials ${isElim?'elim':''}">${initials}</div>
+        <div class="pname">${p.name.toUpperCase()}</div>
+        ${isElim?'<span class="elim-x">ELIMINATED</span>':''}
       </div>`;
     }).join('');
   }
 
-  function selectPlayer(i){currentPlayer=players[i];pinBuf="";document.getElementById('pin-who').textContent='OPERATIVE '+currentPlayer.name.toUpperCase();document.getElementById('pin-err').textContent='';renderDots('pin-dots',pinBuf);showScreen('s-pin');}
-  function goProducerPin(){prodBuf="";document.getElementById('prod-err').textContent='';renderDots('prod-dots',prodBuf);showScreen('s-prod-pin');}
-  function renderDots(id,buf){document.getElementById(id).innerHTML=[0,1,2,3].map(i=>`<div class="pin-dot${i<buf.length?' filled':''}"></div>`).join('');}
-  function pk(v){if(pinBuf.length>=4)return;pinBuf+=v;renderDots('pin-dots',pinBuf);if(pinBuf.length===4)setTimeout(checkPin,150);}
-  function pclr(){pinBuf="";renderDots('pin-dots',pinBuf);document.getElementById('pin-err').textContent='';}
-  function pbk(){if(pinBuf.length>0){pinBuf=pinBuf.slice(0,-1);renderDots('pin-dots',pinBuf);}}
-  function checkPin(){if(pinBuf===currentPlayer.pin){loadPlayerScreen();}else{document.getElementById('pin-err').textContent='INVALID CODE — ACCESS DENIED';pinBuf="";renderDots('pin-dots',pinBuf);}}
-  function ppk(v){if(prodBuf.length>=4)return;prodBuf+=v;renderDots('prod-dots',prodBuf);if(prodBuf.length===4)setTimeout(checkProdPin,150);}
-  function ppclr(){prodBuf="";renderDots('prod-dots',prodBuf);document.getElementById('prod-err').textContent='';}
-  function ppbk(){if(prodBuf.length>0){prodBuf=prodBuf.slice(0,-1);renderDots('prod-dots',prodBuf);}}
-  function checkProdPin(){if(prodBuf===PROD_PIN){loadProdHome();}else{document.getElementById('prod-err').textContent='ACCESS DENIED';prodBuf="";renderDots('prod-dots',prodBuf);}}
+  function selectPlayer(name){
+    currentPlayer=players.find(p=>p.name===name);
+    document.getElementById('pin-player-name').textContent=name.toUpperCase();
+    pinAttempt='';renderPinDots();
+    showScreen('s-pin');
+  }
 
-  function loadPlayerScreen(){
+  function pinInput(n){
+    if(pinAttempt.length<4){
+      pinAttempt+=n;renderPinDots();
+      if(pinAttempt.length===4)checkPin();
+    }
+  }
+  function pinBack(){if(pinAttempt.length>0){pinAttempt=pinAttempt.slice(0,-1);renderPinDots();}}
+  function pinClear(){pinAttempt='';renderPinDots();}
+  function renderPinDots(){
+    const dots=document.querySelectorAll('#s-pin .pin-dot');
+    dots.forEach((d,i)=>d.classList.toggle('filled',i<pinAttempt.length));
+  }
+  function checkPin(){
+    if(pinAttempt===currentPlayer.pin){
+      document.getElementById('pin-err').textContent='';
+      showScreen('s-player');
+    }else{
+      document.getElementById('pin-err').textContent='INCORRECT PIN';
+      pinAttempt='';renderPinDots();
+    }
+  }
+
+  /* ── PRODUCER PIN ── */
+  function prodPinInput(n){
+    if(prodPinAttempt.length<4){
+      prodPinAttempt+=n;renderProdPinDots();
+      if(prodPinAttempt.length===4)checkProdPin();
+    }
+  }
+  function prodPinBack(){if(prodPinAttempt.length>0){prodPinAttempt=prodPinAttempt.slice(0,-1);renderProdPinDots();}}
+  function prodPinClear(){prodPinAttempt='';renderProdPinDots();}
+  function renderProdPinDots(){
+    const dots=document.querySelectorAll('#s-prod-pin .pin-dot');
+    dots.forEach((d,i)=>d.classList.toggle('filled',i<prodPinAttempt.length));
+  }
+  function checkProdPin(){
+    if(prodPinAttempt==='0000'){
+      document.getElementById('prod-pin-err').textContent='';
+      currentPlayer={name:'PRODUCER',pin:'0000'};
+      showScreen('s-prod-home');
+    }else{
+      document.getElementById('prod-pin-err').textContent='ACCESS DENIED';
+      prodPinAttempt='';renderProdPinDots();
+    }
+  }
+
+  /* ── PLAYER HUB ── */
+  function loadPlayerHub(){
     const p=currentPlayer;
-    document.getElementById('ph-name').textContent='OPERATIVE '+p.name.toUpperCase();
-    document.getElementById('ph-kills').textContent=p.kills;
-    document.getElementById('ph-duels').textContent=p.duels;
-    const sv=document.getElementById('ph-status-val');
-    sv.textContent=p.status==='Eliminated'?'OUT':'ACTIVE';
-    sv.style.color=p.status==='Eliminated'?'#e24b4a':'#4a9a6a';
-    document.getElementById('ph-target').textContent=p.status==='Eliminated'?'—':p.target;
-    const onBlock=players.filter(x=>x.onBlock);
-    document.getElementById('ph-block-banner').innerHTML=onBlock.length>0
-      ?`<div class="on-block"><div class="on-block-title">CURRENTLY UP FOR ELIMINATION</div><div class="duel-names">${onBlock.map(x=>`<div class="duel-name">${x.name}</div>`).join('<div class="vs-badge">VS</div>')}</div></div>`:'';
-    document.getElementById('ph-challenges').innerHTML=challenges.map(c=>`
-      <div class="ch-card${!c.open?' locked':''}" ${c.open?`onclick="openChallenge(${c.id})"`:''}>
-        <div class="ch-num">MISSION 0${c.id}</div>
-        <div class="ch-title">${c.title}</div>
-        <div class="ch-sub">${c.sub}</div>
-        <span class="status-pill ${c.open?'pill-open':'pill-locked'}">${c.open?'UNLOCKED':'LOCKED'}</span>
-      </div>`).join('');
-    showScreen('s-player');
-  }
-
-  function openChallenge(id){
-    if(id===1)showScreen('s-ch1-rules');
-    if(id===2)showScreen('s-ch2-rules');
-  }
-
-  /* ── PRODUCER HOME ── */
-  function loadProdHome(){
-    const onBlock=players.filter(p=>p.onBlock);
-    const bs=document.getElementById('prod-home-block-section');
-    if(onBlock.length>0){
-      bs.style.display='block';
-      document.getElementById('prod-home-duel-names').innerHTML=onBlock.map(p=>`<div class="duel-name">${p.name}</div>`).join('<div class="vs-badge">VS</div>');
-    }else bs.style.display='none';
-    updateSyncNote();
-    updateChallengeBadges();
-    showScreen('s-prod-home');
-  }
-
-  function updateChallengeBadges(){
-    const b1=document.getElementById('ch1-hub-badge');
-    const b2=document.getElementById('ch2-hub-badge');
-    if(b1){
-      if(ch1State.running){b1.textContent='RUNNING';b1.className='challenge-hub-badge badge-running';}
-      else if(ch1State.round>0){b1.textContent='ROUND '+ch1State.round;b1.className='challenge-hub-badge badge-running';}
-      else{b1.textContent='IDLE';b1.style.cssText='background:#111;color:#444;border:0.5px solid #222';}
-    }
-    if(b2){
-      if(ch2State.phase==='collecting'){b2.textContent='COLLECTING';b2.className='challenge-hub-badge badge-running';}
-      else if(ch2State.phase==='submitting'){b2.textContent='SUBMISSIONS';b2.className='challenge-hub-badge badge-running';}
-      else{b2.textContent='IDLE';b2.style.cssText='background:#111;color:#444;border:0.5px solid #222';}
-    }
+    document.getElementById('player-name-display').textContent=p.name.toUpperCase();
+    document.getElementById('player-kills').textContent=p.kills;
+    document.getElementById('player-duels').textContent=p.duels;
+    document.getElementById('player-status').textContent=p.status.toUpperCase();
+    document.getElementById('player-target').textContent=p.target.toUpperCase();
+    const blocked=players.filter(pl=>pl.onBlock);
+    const banner=document.getElementById('player-duel-banner');
+    if(blocked.length===2){
+      banner.innerHTML=`<div class="on-block"><div class="on-block-title">DUEL IN PROGRESS</div><div class="duel-names"><div class="duel-name">${blocked[0].name.toUpperCase()}</div><div class="vs-badge">VS</div><div class="duel-name">${blocked[1].name.toUpperCase()}</div></div></div>`;
+    }else{banner.innerHTML='';}
   }
 
   /* ── PRODUCER ROSTER ── */
   function loadProdRoster(){
-    document.getElementById('prod-roster').innerHTML=players.map((p,i)=>{
-      const elim=p.status==='Eliminated';
-      return `<div class="operative-card${elim?' eliminated':''}">
-        <div class="op-name">${p.name}
-          ${p.onBlock?'<span class="block-pill">ON BLOCK</span>':''}
-          ${elim?'<span class="elim-pill">ELIMINATED</span>':''}
-          ${!elim&&p.infected?'<span class="inf-pill">INFECTED</span>':''}
-        </div>
-        <div class="op-target">Target: <span>${elim?'—':p.target}</span></div>
+    const list=document.getElementById('prod-roster-list');
+    list.innerHTML=players.map((p,i)=>{
+      const isElim=p.status==='Eliminated';
+      return`<div class="operative-card ${isElim?'eliminated':''}">
+        <div class="op-name">${p.name}${p.onBlock?'<span class="block-pill">ON BLOCK</span>':''}${isElim?'<span class="elim-pill">ELIMINATED</span>':''}${p.infected?'<span class="inf-pill">INFECTED</span>':''}</div>
+        <div class="op-target">Target: <span>${p.target}</span></div>
         <div class="op-stats">
           <div class="op-stat"><div class="op-stat-val">${p.kills}</div><div class="op-stat-lbl">KILLS</div></div>
           <div class="op-stat"><div class="op-stat-val">${p.duels}</div><div class="op-stat-lbl">DUELS</div></div>
-          <div class="op-stat"><div class="op-stat-val" style="font-size:13px;color:${elim?'#e24b4a':'#4a9a6a'}">${elim?'OUT':'ACTIVE'}</div><div class="op-stat-lbl">STATUS</div></div>
         </div>
-        ${!elim
-          ?`<div class="op-buttons" style="margin-bottom:10px">
-              <button class="op-btn btn-kill"    onclick="addKill(${i})">+ KILL</button>
-              <button class="op-btn ${p.onBlock?'btn-unblock':'btn-block'}" onclick="toggleBlock(${i})">${p.onBlock?'UNBLOCK':'ON BLOCK'}</button>
-              <button class="op-btn btn-elim"    onclick="eliminate(${i})">ELIMINATE</button>
-            </div>
-            <button class="op-btn ${p.infected?'btn-healthy':'btn-infected'}" style="width:100%" onclick="toggleInfected(${i})">${p.infected?'MARK HEALTHY':'MARK INFECTED'}</button>`
-          :`<button class="op-btn btn-revive" style="width:100%;margin-top:4px" onclick="revive(${i})">↩ REVIVE OPERATIVE</button>`
-        }
+        <div class="op-buttons">
+          ${!isElim?`<div class="op-btn btn-kill" onclick="addKill(${i})">+ KILL</div>`:''}
+          ${!isElim&&!p.onBlock?`<div class="op-btn btn-block" onclick="toggleBlock(${i})">ON BLOCK</div>`:''}
+          ${p.onBlock?`<div class="op-btn btn-unblock" onclick="toggleBlock(${i})">UNBLOCK</div>`:''}
+          ${!isElim?`<div class="op-btn btn-elim" onclick="eliminate(${i})">ELIMINATE</div>`:''}
+          ${isElim?`<div class="op-btn btn-revive" onclick="revive(${i})">REVIVE</div>`:''}
+          ${!isElim?`<div class="op-btn ${p.infected?'btn-healthy':'btn-infected'}" onclick="toggleInfected(${i})">${p.infected?'HEALTHY':'INFECTED'}</div>`:''}
+        </div>
       </div>`;
     }).join('');
-    showScreen('s-prod-roster');
+  }
+
+  function updateChallengeBadges(){
+    const ch1Badge=document.getElementById('ch1-hub-badge');
+    const ch2Badge=document.getElementById('ch2-hub-badge');
+    if(ch1Badge){
+      if(gameState.ch1_running){
+        ch1Badge.textContent='RUNNING';
+        ch1Badge.className='ch-hub-badge badge-running';
+      }else{
+        ch1Badge.textContent='IDLE';
+        ch1Badge.className='ch-hub-badge badge-idle';
+      }
+    }
+    if(ch2Badge){
+      if(gameState.ch2_phase==='collecting'){
+        ch2Badge.textContent='COLLECTING';
+        ch2Badge.className='ch-hub-badge badge-running';
+      }else if(gameState.ch2_phase==='submitting'){
+        ch2Badge.textContent='SUBMITTING';
+        ch2Badge.className='ch-hub-badge badge-running';
+      }else{
+        ch2Badge.textContent='IDLE';
+        ch2Badge.className='ch-hub-badge badge-idle';
+      }
+    }
   }
 
   /* ── CHALLENGE 1 PLAYER ── */
-  function enterCh1Field(){showScreen('s-ch1-status');clearInterval(ch1State.pollId);renderCh1PlayerView();ch1State.pollId=setInterval(renderCh1PlayerView,500);}
-  function leaveCh1(){clearInterval(ch1State.pollId);showScreen('s-player');}
-
   function renderCh1PlayerView(){
-    const wrap=document.getElementById('ch1-status-wrap');if(!wrap)return;
-    const p=currentPlayer;const isInfected=p?p.infected:false;const s=ch1State;
-    const circumference=2*Math.PI*52;const offset=circumference*(1-s.seconds/ROUND_SECS);
-    if(s.revealed){
-      wrap.style.background=isInfected?'#0d0000':'#00100a';
-      wrap.innerHTML=isInfected
-        ?`<div style="font-size:10px;color:#5a1a1a;letter-spacing:2px;margin-bottom:20px">ROUND ${s.round} REVEAL</div>
-           <div style="width:110px;height:130px;margin:0 auto 24px"><svg viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="lg" cx="50%" cy="30%" r="70%"><stop offset="0%" stop-color="#a83232"/><stop offset="100%" stop-color="#4a0a0a"/></radialGradient></defs><path d="M25 8 H75 L65 55 Q60 75 50 80 Q40 75 35 55 Z" fill="#2a2a2a" stroke="#5a1a1a" stroke-width="2"/><ellipse cx="50" cy="8" rx="25" ry="5" fill="#333" stroke="#5a1a1a" stroke-width="1.5"/><path d="M38 52 Q44 72 50 76 Q56 72 62 52 Z" fill="url(#lg)" opacity="0.9"/><ellipse cx="50" cy="52" rx="12" ry="3" fill="#c04040" opacity="0.6"/><rect x="44" y="80" width="12" height="22" rx="4" fill="#2a2a2a" stroke="#5a1a1a" stroke-width="1.5"/><rect x="32" y="100" width="36" height="6" rx="3" fill="#2a2a2a" stroke="#5a1a1a" stroke-width="1.5"/></svg></div>
-           <div style="font-size:34px;font-weight:700;letter-spacing:3px;color:#e24b4a;margin-bottom:8px">INFECTED</div>
-           <div style="font-size:12px;color:#5a1a1a;letter-spacing:2px">YOU HAVE BEEN COMPROMISED</div>
-           <div style="font-size:10px;color:#3a1010;letter-spacing:1px;margin-top:6px">DO NOT REVEAL YOUR STATUS</div>`
-        :`<div style="font-size:10px;color:#1a5a2a;letter-spacing:2px;margin-bottom:20px">ROUND ${s.round} REVEAL</div>
-           <div style="width:100px;height:100px;margin:0 auto 28px"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50 10 Q80 20 85 50 Q80 80 50 90 Q20 80 15 50 Q20 20 50 10 Z" fill="#0d2a10" stroke="#1e5a22" stroke-width="2"/><circle cx="50" cy="50" r="14" fill="#1a4a1e" stroke="#2a8a30" stroke-width="1.5"/><path d="M43 50 L47 54 L57 44" fill="none" stroke="#4aaa6a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-           <div style="font-size:34px;font-weight:700;letter-spacing:3px;color:#4aaa6a;margin-bottom:8px">HEALTHY</div>
-           <div style="font-size:12px;color:#1a5a2a;letter-spacing:2px">YOU ARE UNINFECTED</div>
-           <div style="font-size:10px;color:#0d3a18;letter-spacing:1px;margin-top:6px">STAY VIGILANT — KEEP PAIRING</div>`;
+    const container=document.getElementById('ch1-status-card-container');
+    const p=currentPlayer;
+    
+    if(gameState.ch1_revealed&&p){
+      const status=p.infected?'infected':'healthy';
+      const icon=p.infected?'🍷':'🌿';
+      const label=p.infected?'INFECTED':'HEALTHY';
+      container.innerHTML=`<div class="status-card ${status}"><div class="status-icon">${icon}</div><div class="status-label">YOUR STATUS</div><div class="status-value ${status}">${label}</div></div>`;
     }else{
-      wrap.style.background='#0a0a0a';
-      const timerColor=s.running?'#c9a84c':'#2a2a2a';
-      wrap.innerHTML=`
-        <div style="font-size:10px;color:#333;letter-spacing:2px;margin-bottom:16px">ROUND ${s.round}</div>
-        <div class="timer-ring" style="margin-bottom:8px">
-          <svg width="130" height="130" viewBox="0 0 130 130">
-            <circle class="timer-track" cx="65" cy="65" r="52"/>
-            <circle cx="65" cy="65" r="52" fill="none" stroke-width="7" stroke-linecap="round" stroke="${timerColor}" stroke-dasharray="${circumference}" stroke-dashoffset="${offset}" style="transform:rotate(-90deg);transform-origin:65px 65px;transition:stroke-dashoffset .95s linear"/>
-          </svg>
-          <div class="timer-num" style="color:${timerColor}">${s.seconds}</div>
-        </div>
-        <div class="waiting-msg">${s.running?'PAIR UP NOW':'WAITING FOR PRODUCER...'}</div>
-        <div class="unknown-card">
-          <div class="unknown-q">?</div>
-          <div style="font-size:18px;font-weight:700;letter-spacing:3px;color:#333;margin-bottom:10px">UNKNOWN</div>
-          <div class="unknown-lbl">YOUR STATUS IS HIDDEN</div>
-          <div class="unknown-lbl" style="margin-top:4px">${s.running?'KEEP PAIRING':'STAND BY'}</div>
-        </div>`;
+      container.innerHTML=`<div class="status-card unknown"><div class="status-icon">❓</div><div class="status-label">YOUR STATUS</div><div class="status-value unknown">UNKNOWN</div></div>`;
+    }
+    
+    // Timer display
+    const timerText=document.getElementById('ch1-timer-text');
+    if(gameState.ch1_running){
+      // Timer running — show countdown (this would need real sync from producer timer state)
+      timerText.textContent='--';
+    }else{
+      timerText.textContent='--';
     }
   }
 
   /* ── CHALLENGE 1 PRODUCER ── */
-  function prodToggleTimer(){
-    if(ch1State.running){
-      clearInterval(ch1State.intervalId);ch1State.running=false;ch1State.intervalId=null;
-      document.getElementById('prod-start-btn').textContent='START ROUND';
-      document.getElementById('prod-start-btn').classList.remove('running');
-      setProdMsg('Timer paused');
+  function renderCh1ProdRoster(){
+    const roster=document.getElementById('prod-ch1-roster');
+    const active=players.filter(p=>p.status!=='Eliminated');
+    roster.innerHTML=active.map((p,i)=>`<div class="operative-card"><div class="op-name">${p.name}${p.infected?'<span class="inf-pill">INFECTED</span>':''}</div><div class="op-buttons"><div class="op-btn ${p.infected?'btn-healthy':'btn-infected'}" onclick="toggleInfected(${players.indexOf(p)})">${p.infected?'MARK HEALTHY':'MARK INFECTED'}</div></div></div>`).join('');
+  }
+
+  async function prodCh1ToggleTimer(){
+    if(ch1State.intervalId){
+      clearInterval(ch1State.intervalId);
+      ch1State.intervalId=null;
+      const btn=document.getElementById('prod-ch1-start-btn');
+      btn.textContent='RESUME ROUND';
+      btn.classList.remove('running');
+      document.getElementById('prod-ch1-pause-btn').disabled=true;
+      await writeGameState('ch1_running','FALSE');
     }else{
-      ch1State.running=true;
-      document.getElementById('prod-start-btn').textContent='PAUSE ROUND';
-      document.getElementById('prod-start-btn').classList.add('running');
-      setProdMsg('Round '+ch1State.round+' running...');
+      ch1State.seconds=CH1_ROUND_SECS;
+      const btn=document.getElementById('prod-ch1-start-btn');
+      btn.textContent='STOP ROUND';
+      btn.classList.add('running');
+      document.getElementById('prod-ch1-pause-btn').disabled=false;
+      await writeGameState('ch1_running','TRUE');
       ch1State.intervalId=setInterval(()=>{
         ch1State.seconds--;
-        document.getElementById('prod-timer-display').textContent=ch1State.seconds;
+        const mins=Math.floor(ch1State.seconds/60);
+        const secs=ch1State.seconds%60;
+        document.getElementById('prod-ch1-timer').textContent=mins+':'+String(secs).padStart(2,'0');
         if(ch1State.seconds<=0){
-          clearInterval(ch1State.intervalId);ch1State.running=false;ch1State.seconds=0;
-          document.getElementById('prod-start-btn').textContent='START ROUND';
-          document.getElementById('prod-start-btn').classList.remove('running');
-          setProdMsg('Round ended — reveal or start next round');
+          clearInterval(ch1State.intervalId);
+          ch1State.intervalId=null;
+          const btn=document.getElementById('prod-ch1-start-btn');
+          btn.textContent='START ROUND';
+          btn.classList.remove('running');
+          document.getElementById('prod-ch1-pause-btn').disabled=true;
+          writeGameState('ch1_running','FALSE');
         }
       },1000);
     }
     updateChallengeBadges();
   }
 
-  function prodTriggerReveal(){
-    ch1State.revealed=true;ch1State.round++;
-    document.getElementById('prod-round').textContent=ch1State.round;
-    setProdMsg('Status revealed to all players');
-    clearTimeout(ch1State.revealTimer);
-    ch1State.revealTimer=setTimeout(()=>{ch1State.revealed=false;setProdMsg('Reveal hidden — ready for next round');},10000);
-    updateChallengeBadges();
-  }
-
-  function prodNextRound(){
+  async function prodCh1Pause(){
     clearInterval(ch1State.intervalId);
-    ch1State.running=false;ch1State.seconds=ROUND_SECS;ch1State.revealed=false;ch1State.intervalId=null;
-    ch1State.round++;
-    document.getElementById('prod-start-btn').textContent='START ROUND';
-    document.getElementById('prod-start-btn').classList.remove('running');
-    document.getElementById('prod-timer-display').textContent=ROUND_SECS;
-    document.getElementById('prod-round').textContent=ch1State.round;
-    setProdMsg('Round '+ch1State.round+' ready — tap Start Round');
+    ch1State.intervalId=null;
+    const btn=document.getElementById('prod-ch1-start-btn');
+    btn.textContent='RESUME ROUND';
+    btn.classList.remove('running');
+    document.getElementById('prod-ch1-pause-btn').disabled=true;
+    await writeGameState('ch1_running','FALSE');
     updateChallengeBadges();
   }
 
-  function setProdMsg(msg){const el=document.getElementById('prod-ch1-status-msg');if(el)el.textContent=msg;}
+  async function prodCh1Reveal(){
+    ch1State.revealed=true;
+    await writeGameState('ch1_revealed','TRUE');
+    setTimeout(async()=>{
+      ch1State.revealed=false;
+      await writeGameState('ch1_revealed','FALSE');
+    },10000);
+  }
 
-  function renderCh1ProdRoster(){
-    const el=document.getElementById('prod-ch1-roster');if(!el)return;
-    el.innerHTML=players.filter(p=>p.status!=='Eliminated').map((p,i)=>{
-      const idx=players.indexOf(p);
-      return `<div class="operative-card" style="padding:14px 16px;margin-bottom:8px">
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <div>
-            <div style="font-size:14px;font-weight:600">${p.name} ${p.infected?'<span class="inf-pill">INFECTED</span>':''}</div>
-          </div>
-          <button class="op-btn ${p.infected?'btn-healthy':'btn-infected'}" style="padding:8px 14px;font-size:11px" onclick="toggleInfected(${idx})">${p.infected?'HEALTHY':'INFECTED'}</button>
-        </div>
-      </div>`;
-    }).join('');
+  async function prodCh1NextRound(){
+    ch1State.round++;
+    ch1State.seconds=CH1_ROUND_SECS;
+    document.getElementById('prod-ch1-round').textContent='ROUND '+ch1State.round;
+    document.getElementById('prod-ch1-timer').textContent='0:'+CH1_ROUND_SECS;
+    await writeGameState('ch1_round',ch1State.round.toString());
   }
 
   /* ── CHALLENGE 2 PLAYER ── */
-  function enterCh2(){ch2Player={word:'',leftover:0,submitted:false};showScreen('s-ch2-play');clearInterval(ch2State.playerPollId);renderCh2PlayerView();ch2State.playerPollId=setInterval(renderCh2PlayerView,500);}
-  function leaveCh2(){clearInterval(ch2State.playerPollId);showScreen('s-player');}
-
   function renderCh2PlayerView(){
-    const el=document.getElementById('ch2-player-content');if(!el)return;
-    const phase=ch2State.phase;
-    if(phase==='idle'){
-      el.innerHTML=`<div style="text-align:center;padding:80px 20px"><div style="font-size:40px;color:#2a2a2a;margin-bottom:20px">⏳</div><div style="font-size:13px;color:#444;letter-spacing:2px;margin-bottom:8px">WAITING FOR PRODUCER</div><div style="font-size:11px;color:#2a2a2a;letter-spacing:1px">Collection phase has not started</div></div>`;
-    }else if(phase==='collecting'){
-      const mins=Math.floor(ch2State.seconds/60);const secs=ch2State.seconds%60;
-      const display=mins+':'+String(secs).padStart(2,'0');const urgent=ch2State.seconds<=30;
-      el.innerHTML=`<div style="text-align:center;padding-top:60px">
-        <div style="font-size:11px;color:#444;letter-spacing:3px;margin-bottom:12px">COLLECTION PHASE</div>
-        <div class="ch2-big-timer${urgent?' urgent':''}">${display}</div>
-        <div style="font-size:11px;color:${urgent?'#e24b4a':'#333'};letter-spacing:2px;margin-bottom:40px">${urgent?'HURRY — ALMOST TIME':'RACE FOR YOUR TILES'}</div>
-        <div style="background:#111;border:0.5px solid #1e1e1e;border-radius:14px;padding:20px;text-align:left">
-          <div style="font-size:10px;color:#c9a84c;letter-spacing:2px;margin-bottom:10px">REMEMBER</div>
-          <div style="font-size:12px;color:#666;line-height:1.8">Place tiles in your cup to secure.<br>Drop in another's cup to sabotage.<br>Unused tiles = -1 point each.</div>
-        </div></div>`;
-    }else if(phase==='submitting'){
+    const view=document.getElementById('ch2-player-view');
+    
+    if(gameState.ch2_phase==='collecting'){
+      view.innerHTML=`<div class="ch2-phase-card"><div class="ch2-phase-title">COLLECTION PHASE</div><div class="ch2-phase-msg">Grab tiles and place them in cups!</div></div>`;
+    }else if(gameState.ch2_phase==='submitting'){
       if(ch2Player.submitted){
-        const score=(ch2Player.word.length*2)-ch2Player.leftover;
-        el.innerHTML=`<div style="text-align:center;padding-top:40px">
-          <div style="font-size:11px;color:#4a9;letter-spacing:2px;margin-bottom:20px">WORD SUBMITTED</div>
-          <div style="font-size:36px;font-weight:700;letter-spacing:4px;color:#4aaa6a;margin-bottom:16px">${ch2Player.word.toUpperCase()}</div>
-          <div class="ch2-submitted-banner">
-            <div style="font-size:11px;color:#4a9;letter-spacing:2px;margin-bottom:8px">YOUR SCORE</div>
-            <div style="font-size:36px;font-weight:700;color:#4aaa6a">${score>=0?'+':''}${score}</div>
-            <div style="font-size:11px;color:#2a5a2a;margin-top:8px;letter-spacing:1px">${ch2Player.word.length} letters × 2 = ${ch2Player.word.length*2} &nbsp;|&nbsp; ${ch2Player.leftover} unused = -${ch2Player.leftover}</div>
-          </div>
-          <div style="font-size:11px;color:#2a2a2a;letter-spacing:1px;margin-top:20px">Awaiting producer validation</div></div>`;
-      }else{renderCh2SubmitForm(el);}
+        view.innerHTML=`<div class="ch2-phase-card"><div class="ch2-phase-title">SUBMITTED</div><div class="ch2-phase-msg">Your word: ${ch2Player.word.toUpperCase()}</div></div>`;
+      }else{
+        view.innerHTML=`<div class="ch2-phase-card"><div class="ch2-phase-title">SUBMISSION PHASE</div><div class="ch2-phase-msg">Make your best word and submit</div></div><div class="ch2-form"><div class="ch2-input-group"><label class="ch2-input-lbl">YOUR WORD</label><input type="text" class="ch2-input" id="ch2-word-input" placeholder="Enter word"></div><div class="ch2-input-group"><label class="ch2-input-lbl">LEFTOVER TILES</label><input type="number" class="ch2-input" id="ch2-leftover-input" placeholder="0" min="0"></div><button class="gold-btn" onclick="ch2Submit()">SUBMIT WORD</button></div>`;
+        document.getElementById('ch2-word-input').addEventListener('input',e=>ch2Player.word=e.target.value.trim());
+        document.getElementById('ch2-leftover-input').addEventListener('input',e=>ch2Player.leftover=parseInt(e.target.value)||0);
+      }
     }else{
-      el.innerHTML=`<div style="text-align:center;padding-top:80px"><div style="font-size:11px;color:#444;letter-spacing:2px;margin-bottom:20px">CHALLENGE COMPLETE</div><div style="font-size:18px;font-weight:700;color:#c9a84c;letter-spacing:2px">INTEL SCRAMBLE OVER</div><div style="font-size:11px;color:#333;margin-top:12px;letter-spacing:1px">Await producer announcement</div></div>`;
+      view.innerHTML=`<div class="ch2-phase-card"><div class="ch2-phase-title">WAITING</div><div class="ch2-phase-msg">Collection phase will begin soon</div></div>`;
     }
   }
-
-  function renderCh2SubmitForm(el){
-    const word=ch2Player.word;const leftover=ch2Player.leftover;
-    const wordScore=word.length*2;const total=wordScore-leftover;
-    el.innerHTML=`<div style="margin-bottom:8px;text-align:center"><div style="font-size:11px;color:#444;letter-spacing:2px">COLLECTION ENDED — SUBMIT YOUR WORD</div></div>
-      <div class="ch2-phase">
-        <div class="ch2-phase-title">YOUR BEST WORD</div>
-        <input class="ch2-input" id="ch2-word-input" type="text" maxlength="20" placeholder="TYPE YOUR WORD" value="${word}" oninput="ch2WordChanged(this.value)" autocomplete="off" autocorrect="off" spellcheck="false">
-        <div class="ch2-leftover-lbl">LEFTOVER TILES</div>
-        <div class="ch2-leftover-row">
-          <button class="ch2-leftover-btn" onclick="ch2AdjLeftover(-1)">−</button>
-          <div class="ch2-leftover-num">${leftover}</div>
-          <button class="ch2-leftover-btn" onclick="ch2AdjLeftover(1)">+</button>
-        </div>
-        <div class="ch2-counter-row">
-          <div class="ch2-counter-box"><div class="ch2-counter-val">${word.length}</div><div class="ch2-counter-lbl">LETTERS</div></div>
-          <div class="ch2-counter-box"><div class="ch2-counter-val">+${wordScore}</div><div class="ch2-counter-lbl">WORD PTS</div></div>
-          <div class="ch2-counter-box"><div class="ch2-counter-val negative">-${leftover}</div><div class="ch2-counter-lbl">PENALTY</div></div>
-          <div class="ch2-counter-box"><div class="ch2-counter-val" style="color:${total>=0?'#c9a84c':'#e24b4a'}">${total>=0?'+':''}${total}</div><div class="ch2-counter-lbl">TOTAL</div></div>
-        </div>
-        <button class="gold-btn" onclick="ch2Submit()" ${!word?'disabled':''}>SUBMIT WORD</button>
-      </div>`;
-  }
-
-  function ch2WordChanged(val){ch2Player.word=val.toUpperCase().replace(/[^A-Z]/g,'');const input=document.getElementById('ch2-word-input');if(input)input.value=ch2Player.word;renderCh2SubmitForm(document.getElementById('ch2-player-content'));}
-  function ch2AdjLeftover(delta){ch2Player.leftover=Math.max(0,ch2Player.leftover+delta);renderCh2SubmitForm(document.getElementById('ch2-player-content'));}
 
   async function ch2Submit(){
     const word=ch2Player.word;const leftover=ch2Player.leftover;if(!word)return;
@@ -879,20 +955,22 @@
   }
 
   /* ── CHALLENGE 2 PRODUCER ── */
-  function prodCh2ToggleTimer(){
+  async function prodCh2ToggleTimer(){
     if(ch2State.phase==='collecting'){
       clearInterval(ch2State.intervalId);ch2State.intervalId=null;ch2State.phase='submitting';
       const btn=document.getElementById('prod-ch2-start-btn');
       btn.textContent='COLLECTION ENDED';btn.classList.remove('running');btn.disabled=true;
       document.getElementById('prod-ch2-phase-lbl').textContent='SUBMISSION PHASE';
       document.getElementById('prod-ch2-msg').textContent='Players are now submitting words';
+      await writeGameState('ch2_phase','submitting');
     }else if(ch2State.phase==='idle'){
       ch2State.phase='collecting';ch2State.seconds=CH2_COLLECT_SECS;
       const btn=document.getElementById('prod-ch2-start-btn');
       btn.textContent='STOP COLLECTION';btn.classList.add('running');btn.disabled=false;
       document.getElementById('prod-ch2-phase-lbl').textContent='COLLECTION PHASE — RUNNING';
       document.getElementById('prod-ch2-msg').textContent='Collection phase started';
-      ch2State.intervalId=setInterval(()=>{
+      await writeGameState('ch2_phase','collecting');
+      ch2State.intervalId=setInterval(async()=>{
         ch2State.seconds--;
         const mins=Math.floor(ch2State.seconds/60);const secs=ch2State.seconds%60;
         document.getElementById('prod-ch2-timer').textContent=mins+':'+String(secs).padStart(2,'0');
@@ -902,13 +980,14 @@
           btn.textContent='COLLECTION ENDED';btn.classList.remove('running');btn.disabled=true;
           document.getElementById('prod-ch2-phase-lbl').textContent='SUBMISSION PHASE';
           document.getElementById('prod-ch2-msg').textContent='Time up — players now submitting';
+          await writeGameState('ch2_phase','submitting');
         }
       },1000);
     }
     updateChallengeBadges();
   }
 
-  function prodCh2Reset(){
+  async function prodCh2Reset(){
     clearInterval(ch2State.intervalId);ch2State.intervalId=null;
     ch2State.phase='idle';ch2State.seconds=CH2_COLLECT_SECS;
     const btn=document.getElementById('prod-ch2-start-btn');
@@ -916,6 +995,7 @@
     document.getElementById('prod-ch2-timer').textContent='3:00';
     document.getElementById('prod-ch2-phase-lbl').textContent='COLLECTION PHASE';
     document.getElementById('prod-ch2-msg').textContent='Timer reset';
+    await writeGameState('ch2_phase','idle');
     updateChallengeBadges();
   }
 
@@ -959,17 +1039,6 @@
     loadProdRoster();await savePlayer(p);renderLoginGrid();
     showSaveMsg(p.name.toUpperCase()+' REVIVED','#7ec8e3');
   }
-
-  /* on entering CH1 prod screen, render infection roster */
-  document.getElementById('s-prod-ch1').addEventListener('click',()=>{},true);
-  const origShowScreen=showScreen;
-  window.showScreen=function(id){
-    origShowScreen(id);
-    if(id==='s-prod-ch1'){
-      document.getElementById('prod-infected-count').textContent=players.filter(p=>p.infected&&p.status!=='Eliminated').length;
-      renderCh1ProdRoster();
-    }
-  };
 
   loadFromSheets();
 </script>
