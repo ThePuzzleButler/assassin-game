@@ -293,10 +293,11 @@
 
   <!-- CHALLENGE 1 STATUS -->
   <div id="s-ch1-status" class="screen" style="padding:0;position:relative">
-    <div style="position:absolute;top:20px;left:20px;z-index:10">
+    <div style="position:absolute;top:20px;left:20px;z-index:10;display:flex;gap:8px;align-items:center">
       <button class="back-btn" onclick="leaveCh1()">← EXIT</button>
+      <button class="back-btn" onclick="playerChallengeSync('ch1')" style="color:#7ec8e3;border-color:#1a3a4a">↺ SYNC</button>
     </div>
-    <div style="position:absolute;top:24px;right:20px;z-index:10;font-size:10px;color:#2a2a2a;letter-spacing:1px" id="ch1-sync-note">SYNCING...</div>
+    <div style="position:absolute;top:28px;right:16px;z-index:10;font-size:10px;color:#2a2a2a;letter-spacing:1px;text-align:right" id="ch1-sync-note">SYNCING...</div>
     <div class="ch1-status-wrap" id="ch1-status-wrap"></div>
   </div>
 
@@ -396,7 +397,10 @@
   <div id="s-ch5-play" class="screen">
     <div class="top-bar">
       <button class="back-btn" onclick="leaveCh5()">← EXIT</button>
-      <div style="font-size:10px;color:#7ec8e3;letter-spacing:2px">INTEL SCRAMBLE</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="font-size:10px;color:#2a2a2a;letter-spacing:1px" id="ch5-sync-note"></div>
+        <button class="back-btn" onclick="playerChallengeSync('ch5')" style="color:#7ec8e3;border-color:#1a3a4a">↺ SYNC</button>
+      </div>
     </div>
     <div id="ch5-player-content"></div>
   </div>
@@ -680,20 +684,48 @@
     return Promise.race([fetch(url), new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),ms))]);
   }
 
+  // All proxies in one list — tried in parallel for speed, first good result wins
+  const PROXIES = [
+    u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+    u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+    u => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`
+  ];
+
+  // Try all proxies in parallel and return the first valid response
+  async function fetchAnyProxy(url, timeoutMs=5000) {
+    return new Promise((resolve, reject) => {
+      let settled = false;
+      let failed = 0;
+      PROXIES.forEach(proxy => {
+        fetchWithTimeout(proxy(url), timeoutMs)
+          .then(res => {
+            if (settled) return;
+            if (!res.ok) { failed++; if (failed===PROXIES.length) reject(new Error('all failed')); return; }
+            return res.text().then(text => {
+              if (settled) return;
+              if (!text || text.trim().length < 5) { failed++; if (failed===PROXIES.length) reject(new Error('empty')); return; }
+              settled = true;
+              resolve(text);
+            });
+          })
+          .catch(() => { failed++; if (failed===PROXIES.length && !settled) reject(new Error('all failed')); });
+      });
+    });
+  }
+
+  // Track which proxy worked last so we try it first next time
+  let preferredProxyIdx = 0;
+
   async function tryFetch() {
-    const proxies=[u=>`https://corsproxy.io/?${encodeURIComponent(u)}`,u=>`https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,u=>`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`];
-    for (let i=0;i<proxies.length;i++) {
-      setMsg('TRYING CONNECTION '+(i+1)+' OF '+proxies.length+'...');
-      try {
-        const res=await fetchWithTimeout(proxies[i](SHEET_URL),7000);
-        if(!res.ok)continue;
-        const text=await res.text();
-        if(!text||text.trim().length<10)continue;
-        const parsed=parseCSV(text);
-        if(parsed.length>0)return parsed;
-      }catch(e){continue;}
+    setMsg('CONNECTING TO COMMAND...');
+    try {
+      const text = await fetchAnyProxy(SHEET_URL, 6000);
+      const parsed = parseCSV(text);
+      if (parsed.length > 0) return parsed;
+      throw new Error('empty parse');
+    } catch(e) {
+      throw new Error('all proxies failed');
     }
-    throw new Error('all proxies failed');
   }
 
   async function savePlayer(player) {
@@ -736,10 +768,11 @@
   let gsPoller = null;
   let lastGameState = {};
 
-  function startGameStatePolling() {
-    if (gsPoller) return;
+  function startGameStatePolling(fast=false) {
+    stopGameStatePolling();
     pollGameState();
-    gsPoller = setInterval(pollGameState, 5000);
+    // Poll every 2 seconds on challenge screens, 5 seconds otherwise
+    gsPoller = setInterval(pollGameState, fast ? 2000 : 5000);
   }
 
   function stopGameStatePolling() {
@@ -748,26 +781,15 @@
   }
 
   async function pollGameState() {
-    // Read GameState from the published sheet CSV — same method that already works for player data
-    // GameState tab is published separately as gid=1 (second tab)
     const baseUrl = SHEET_URL.replace('gid=0','gid=574646101');
-    const proxies = [
-      u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
-      u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
-      u => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`
-    ];
-    for (let i = 0; i < proxies.length; i++) {
-      try {
-        const res = await fetchWithTimeout(proxies[i](baseUrl), 4000);
-        if (!res.ok) continue;
-        const text = await res.text();
-        if (!text || text.trim().length < 5) continue;
-        const gs = parseGameStateCSV(text);
-        if (gs && Object.keys(gs).length > 0) {
-          applyGameState(gs);
-          return;
-        }
-      } catch(e) { continue; }
+    try {
+      const text = await fetchAnyProxy(baseUrl, 4000);
+      const gs = parseGameStateCSV(text);
+      if (gs && Object.keys(gs).length > 0) {
+        applyGameState(gs);
+      }
+    } catch(e) {
+      // Silent fail — next poll will retry in 5 seconds
     }
   }
 
@@ -784,9 +806,12 @@
   function applyGameState(gs) {
     const prev = lastGameState;
     lastGameState = gs;
-    // Update sync indicator
-    const note = document.getElementById('ch1-sync-note');
-    if (note) { note.textContent = 'LIVE ' + new Date().toLocaleTimeString(); note.style.color = '#2a4a2a'; }
+    // Update sync indicators on any active challenge screen
+    const t = 'LIVE ' + new Date().toLocaleTimeString();
+    ['ch1-sync-note','ch5-sync-note'].forEach(id => {
+      const el = document.getElementById(id);
+      if(el){ el.textContent = t; el.style.color = '#2a4a2a'; }
+    });
 
     // Update ch1 state from sheet
     const newRound = parseInt(gs.ch1_round) || 0;
@@ -928,13 +953,41 @@
     saveGameState('ch'+missionId+'_teams', JSON.stringify(teams));
   }
 
+  // Sync button on challenge screens — polls both player data and game state immediately
+  async function playerChallengeSync(challenge) {
+    const noteId = challenge==='ch1' ? 'ch1-sync-note' : 'ch5-sync-note';
+    const note = document.getElementById(noteId);
+    if(note){ note.textContent='SYNCING...'; note.style.color='#c9a84c'; }
+    try {
+      // Refresh both player data and game state in parallel
+      const [fresh] = await Promise.all([
+        tryFetch(),
+        pollGameState()
+      ]);
+      fresh.forEach(fp => {
+        const ex = players.find(p => p.name===fp.name);
+        if(ex){ fp.onBlock=ex.onBlock; fp.originalTarget=ex.originalTarget||fp.target; }
+      });
+      players = fresh;
+      if(currentPlayer){
+        const updated = players.find(p => p.name===currentPlayer.name);
+        if(updated) currentPlayer = updated;
+      }
+      // Re-render the challenge view immediately
+      if(challenge==='ch1') renderCh1PlayerView();
+      if(challenge==='ch5') renderCh5PlayerView();
+      if(note){ note.textContent='LIVE '+new Date().toLocaleTimeString(); note.style.color='#2a4a2a'; }
+    } catch(e) {
+      if(note){ note.textContent='SYNC FAILED'; note.style.color='#e24b4a'; }
+    }
+  }
+
   async function playerSync(){
     const btn=document.getElementById('player-sync-btn');
     const note=document.getElementById('player-sync-note');
     if(btn){btn.textContent='SYNCING...';btn.disabled=true;}
     try{
       const fresh=await tryFetch();
-      // Update players array and currentPlayer
       fresh.forEach(fp=>{
         const ex=players.find(p=>p.name===fp.name);
         if(ex){fp.onBlock=ex.onBlock;fp.originalTarget=ex.originalTarget||fp.target;}
@@ -945,7 +998,6 @@
         if(updated)currentPlayer=updated;
       }
       lastSync=new Date();
-      // Refresh the player hub display
       loadPlayerScreen();
       if(note)note.textContent='SYNCED '+lastSync.toLocaleTimeString();
     }catch(e){
@@ -1045,7 +1097,7 @@
   }
 
   /* ── CHALLENGE 1 PLAYER ── */
-  function enterCh1Field(){showScreen('s-ch1-status');startGameStatePolling();clearInterval(ch1State.pollId);renderCh1PlayerView();ch1State.pollId=setInterval(renderCh1PlayerView,500);}
+  function enterCh1Field(){showScreen('s-ch1-status');startGameStatePolling(true);pollGameState().then(()=>renderCh1PlayerView());clearInterval(ch1State.pollId);ch1State.pollId=setInterval(renderCh1PlayerView,500);}
   function leaveCh1(){clearInterval(ch1State.pollId);stopGameStatePolling();showScreen('s-player');}
 
   function renderCh1PlayerView(){
@@ -1166,14 +1218,14 @@
 
   /* ── CHALLENGE 2 PLAYER ── */
   function enterCh5(){
-    // Only reset submission state if challenge hasn't started yet
     if(ch5State.phase==='idle') ch5Player={word:'',leftover:0,submitted:false};
     showScreen('s-ch5-play');
-    startGameStatePolling();
+    // Fast polling — every 2 seconds while on this screen
+    startGameStatePolling(true);
     clearInterval(ch5State.playerPollId);
-    // Immediately poll so player gets current phase without waiting 5 seconds
-    pollGameState().then(()=>renderCh5PlayerView());
-    ch5State.playerPollId=setInterval(renderCh5PlayerView,500);
+    // Immediately poll then render
+    pollGameState().then(()=>{ renderCh5PlayerView(); });
+    ch5State.playerPollId=setInterval(renderCh5PlayerView, 500);
   }
   function leaveCh5(){clearInterval(ch5State.playerPollId);stopGameStatePolling();showScreen('s-player');}
 
