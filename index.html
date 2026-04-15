@@ -372,7 +372,7 @@
     <div class="rule-card"><div class="rule-num">3</div><div class="rule-text">After <strong>3 minutes</strong> all players stop. You then have <strong>1 minute 30 seconds</strong> to form the longest word possible and submit it below.</div></div>
     <div class="rule-card"><div class="rule-num">4</div><div class="rule-text">Scoring: each letter in your word = <strong>+2 points</strong>. Each unused tile = <strong>-1 point</strong>.</div></div>
     <div class="rule-card"><div class="rule-num">5</div><div class="rule-text">Only collect what you need — extra tiles count against you. <strong>Top score wins</strong> and puts their target up for elimination.</div></div>
-    <button class="gold-btn" onclick="enterCh2()">ENTER THE FIELD</button>
+    <button class="gold-btn" onclick="enterCh5()">ENTER THE FIELD</button>
   </div>
 
   <!-- FINAL MISSION RULES — TARGET ACQUIRED -->
@@ -393,12 +393,12 @@
   </div>
 
   <!-- CHALLENGE 2 PLAY -->
-  <div id="s-ch2-play" class="screen">
+  <div id="s-ch5-play" class="screen">
     <div class="top-bar">
-      <button class="back-btn" onclick="leaveCh2()">← EXIT</button>
+      <button class="back-btn" onclick="leaveCh5()">← EXIT</button>
       <div style="font-size:10px;color:#7ec8e3;letter-spacing:2px">INTEL SCRAMBLE</div>
     </div>
-    <div id="ch2-player-content"></div>
+    <div id="ch5-player-content"></div>
   </div>
 
   <!-- PRODUCER PIN -->
@@ -619,15 +619,15 @@
     </div>
     <div class="ch-control-wrap" style="border-color:#7ec8e333">
       <div class="ch-control-title" style="color:#7ec8e3">COLLECTION TIMER</div>
-      <div class="ch2-timer-big" id="prod-ch2-timer">3:00</div>
-      <div class="ch2-timer-lbl" id="prod-ch2-phase-lbl">COLLECTION PHASE</div>
-      <button class="ch-btn ch-btn-blue" id="prod-ch2-start-btn" onclick="prodCh2ToggleTimer()">START COLLECTION</button>
-      <button class="ch-btn ch-btn-gray" onclick="prodCh2Reset()">RESET TIMER</button>
-      <div style="font-size:10px;color:#2a2a2a;letter-spacing:1px;margin-top:4px;text-align:center" id="prod-ch2-msg">Ready to start collection phase</div>
+      <div class="ch2-timer-big" id="prod-ch5-timer">3:00</div>
+      <div class="ch2-timer-lbl" id="prod-ch5-phase-lbl">COLLECTION PHASE</div>
+      <button class="ch-btn ch-btn-blue" id="prod-ch5-start-btn" onclick="prodCh5ToggleTimer()">START COLLECTION</button>
+      <button class="ch-btn ch-btn-gray" onclick="prodCh5Reset()">RESET TIMER</button>
+      <div style="font-size:10px;color:#2a2a2a;letter-spacing:1px;margin-top:4px;text-align:center" id="prod-ch5-msg">Ready to start collection phase</div>
     </div>
     <div class="divider"></div>
     <p class="section-label">WORD SUBMISSIONS</p>
-    <div id="prod-ch2-submissions"><div style="font-size:11px;color:#2a2a2a;letter-spacing:1px;text-align:center;padding:16px 0">No submissions yet</div></div>
+    <div id="prod-ch5-submissions"><div style="font-size:11px;color:#2a2a2a;letter-spacing:1px;text-align:center;padding:16px 0">No submissions yet</div></div>
   </div>
 
 </div>
@@ -651,8 +651,8 @@
   let players = [], currentPlayer = null, pinBuf = "", prodBuf = "", lastSync = null;
 
   let ch1State = { running:false, seconds:ROUND_SECS, round:0, revealed:false, revealTimer:null, intervalId:null, pollId:null, playerCountdown:null };
-  let ch2State = { phase:'idle', seconds:CH2_COLLECT_SECS, intervalId:null, playerPollId:null, submissions:{} };
-  let ch2Player = { word:'', leftover:0, submitted:false };
+  let ch5State = { phase:'idle', seconds:CH2_COLLECT_SECS, intervalId:null, playerPollId:null, submissions:{} };
+  let ch5Player = { word:'', leftover:0, submitted:false };
 
   const fallback = [
     {name:"Alex",    pin:"1111", target:"Brian",   originalTarget:"Brian",   kills:0, duels:0, status:"Active", onBlock:false, infected:false},
@@ -797,43 +797,11 @@
     ch1State.round = newRound;
     ch1State.revealed = newRevealed;
 
-    // If producer just started the round — kick off local countdown on player's phone
-    if (newRunning && !wasRunning) {
-      ch1State.running = true;
-      ch1State.seconds = ROUND_SECS;
-      clearInterval(ch1State.playerCountdown);
-      ch1State.playerCountdown = setInterval(() => {
-        ch1State.seconds--;
-        if (ch1State.seconds <= 0) {
-          ch1State.seconds = 0;
-          clearInterval(ch1State.playerCountdown);
-          ch1State.playerCountdown = null;
-          // Don't set running=false here — wait for sheet to confirm
-        }
-      }, 1000);
-    }
-
-    // If producer paused or stopped — stop local countdown
-    if (!newRunning && wasRunning) {
-      ch1State.running = false;
-      clearInterval(ch1State.playerCountdown);
-      ch1State.playerCountdown = null;
-    }
-
-    // If a new round starts (round number changed) — reset timer
-    if (newRound !== (parseInt(prev.ch1_round) || 0) && !newRunning) {
-      ch1State.seconds = ROUND_SECS;
-      clearInterval(ch1State.playerCountdown);
-      ch1State.playerCountdown = null;
-    }
-
     ch1State.running = newRunning;
 
-    // Update ch5 (Intel Scramble) phase
+    // Update ch5 (Intel Scramble) phase — always apply regardless of previous value
     const ch5Phase = gs.ch5_phase || 'idle';
-    if (ch5Phase !== (prev.ch5_phase || 'idle')) {
-      ch2State.phase = ch5Phase;
-    }
+    ch5State.phase = ch5Phase;
 
     // Refresh player's own infected status from sheet
     if (currentPlayer) {
@@ -1040,8 +1008,8 @@
       else{b1.textContent='IDLE';b1.style.cssText='background:#111;color:#444;border:0.5px solid #222';}
     }
     if(b2){
-      if(ch2State.phase==='collecting'){b2.textContent='COLLECTING';b2.className='challenge-hub-badge badge-running';}
-      else if(ch2State.phase==='submitting'){b2.textContent='SUBMISSIONS';b2.className='challenge-hub-badge badge-running';}
+      if(ch5State.phase==='collecting'){b2.textContent='COLLECTING';b2.className='challenge-hub-badge badge-running';}
+      else if(ch5State.phase==='submitting'){b2.textContent='SUBMISSIONS';b2.className='challenge-hub-badge badge-running';}
       else{b2.textContent='IDLE';b2.style.cssText='background:#111;color:#444;border:0.5px solid #222';}
     }
   }
@@ -1083,39 +1051,47 @@
   function renderCh1PlayerView(){
     const wrap=document.getElementById('ch1-status-wrap');if(!wrap)return;
     const p=currentPlayer;const isInfected=p?p.infected:false;const s=ch1State;
-    const circumference=2*Math.PI*52;const offset=circumference*(1-s.seconds/ROUND_SECS);
-    const timerColor=s.running?'#c9a84c':'#2a2a2a';
-
-    // Status icon — always visible, healthy by default until marked infected
-    const statusBlock=isInfected
-      ?`<div style="width:110px;height:130px;margin:0 auto 20px"><svg viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="lg" cx="50%" cy="30%" r="70%"><stop offset="0%" stop-color="#a83232"/><stop offset="100%" stop-color="#4a0a0a"/></radialGradient></defs><path d="M25 8 H75 L65 55 Q60 75 50 80 Q40 75 35 55 Z" fill="#2a2a2a" stroke="#5a1a1a" stroke-width="2"/><ellipse cx="50" cy="8" rx="25" ry="5" fill="#333" stroke="#5a1a1a" stroke-width="1.5"/><path d="M38 52 Q44 72 50 76 Q56 72 62 52 Z" fill="url(#lg)" opacity="0.9"/><ellipse cx="50" cy="52" rx="12" ry="3" fill="#c04040" opacity="0.6"/><rect x="44" y="80" width="12" height="22" rx="4" fill="#2a2a2a" stroke="#5a1a1a" stroke-width="1.5"/><rect x="32" y="100" width="36" height="6" rx="3" fill="#2a2a2a" stroke="#5a1a1a" stroke-width="1.5"/></svg></div>
-         <div style="font-size:34px;font-weight:700;letter-spacing:3px;color:#e24b4a;margin-bottom:6px">INFECTED</div>
-         <div style="font-size:11px;color:#5a1a1a;letter-spacing:2px;margin-bottom:4px">YOU HAVE BEEN COMPROMISED</div>
-         <div style="font-size:10px;color:#3a1010;letter-spacing:1px;margin-bottom:28px">DO NOT REVEAL YOUR STATUS</div>`
-      :`<div style="width:100px;height:100px;margin:0 auto 20px"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50 10 Q80 20 85 50 Q80 80 50 90 Q20 80 15 50 Q20 20 50 10 Z" fill="#0d2a10" stroke="#1e5a22" stroke-width="2"/><circle cx="50" cy="50" r="14" fill="#1a4a1e" stroke="#2a8a30" stroke-width="1.5"/><path d="M43 50 L47 54 L57 44" fill="none" stroke="#4aaa6a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-         <div style="font-size:34px;font-weight:700;letter-spacing:3px;color:#4aaa6a;margin-bottom:6px">HEALTHY</div>
-         <div style="font-size:11px;color:#1a5a2a;letter-spacing:2px;margin-bottom:4px">YOU ARE UNINFECTED</div>
-         <div style="font-size:10px;color:#0d3a18;letter-spacing:1px;margin-bottom:28px">STAY VIGILANT — KEEP PAIRING</div>`;
 
     wrap.style.background=isInfected?'#0d0000':'#00100a';
 
-    const revealLabel=s.revealed
-      ?`<div style="font-size:10px;color:${isInfected?'#5a1a1a':'#1a5a2a'};letter-spacing:2px;margin-bottom:16px">ROUND ${s.round} — STATUS REVEALED</div>`
-      :`<div style="font-size:10px;color:#2a2a2a;letter-spacing:2px;margin-bottom:16px">ROUND ${s.round}${s.running?' — PAIR UP NOW':' — STAND BY'}</div>`;
+    const roundLabel=s.round>0
+      ?`<div style="font-size:10px;color:${isInfected?'#5a1a1a':'#1a5a2a'};letter-spacing:2px;margin-bottom:24px">ROUND ${s.round}${s.running?' — PAIR UP NOW':s.revealed?' — STATUS REVEALED':' — STAND BY'}</div>`
+      :`<div style="font-size:10px;color:#2a2a2a;letter-spacing:2px;margin-bottom:24px">WAITING FOR PRODUCER</div>`;
 
-    wrap.innerHTML=`
-      ${revealLabel}
-      ${statusBlock}
-      <div class="timer-ring" style="margin-bottom:6px">
-        <svg width="130" height="130" viewBox="0 0 130 130">
-          <circle class="timer-track" cx="65" cy="65" r="52"/>
-          <circle cx="65" cy="65" r="52" fill="none" stroke-width="7" stroke-linecap="round"
-            stroke="${timerColor}" stroke-dasharray="${circumference}" stroke-dashoffset="${offset}"
-            style="transform:rotate(-90deg);transform-origin:65px 65px;transition:stroke-dashoffset .95s linear"/>
-        </svg>
-        <div class="timer-num" style="color:${timerColor}">${s.seconds}</div>
-      </div>
-      <div style="font-size:10px;color:#2a2a2a;letter-spacing:2px;margin-top:6px">${s.running?'KEEP PAIRING UNTIL TIMER ENDS':'WAITING FOR PRODUCER'}</div>`;
+    if(isInfected){
+      wrap.innerHTML=`
+        ${roundLabel}
+        <div style="width:110px;height:130px;margin:0 auto 24px">
+          <svg viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+            <defs><radialGradient id="lg" cx="50%" cy="30%" r="70%"><stop offset="0%" stop-color="#a83232"/><stop offset="100%" stop-color="#4a0a0a"/></radialGradient></defs>
+            <path d="M25 8 H75 L65 55 Q60 75 50 80 Q40 75 35 55 Z" fill="#2a2a2a" stroke="#5a1a1a" stroke-width="2"/>
+            <ellipse cx="50" cy="8" rx="25" ry="5" fill="#333" stroke="#5a1a1a" stroke-width="1.5"/>
+            <path d="M38 52 Q44 72 50 76 Q56 72 62 52 Z" fill="url(#lg)" opacity="0.9"/>
+            <ellipse cx="50" cy="52" rx="12" ry="3" fill="#c04040" opacity="0.6"/>
+            <rect x="44" y="80" width="12" height="22" rx="4" fill="#2a2a2a" stroke="#5a1a1a" stroke-width="1.5"/>
+            <rect x="32" y="100" width="36" height="6" rx="3" fill="#2a2a2a" stroke="#5a1a1a" stroke-width="1.5"/>
+            <circle cx="42" cy="30" r="3" fill="#e24b4a" opacity="0.7"/>
+            <circle cx="50" cy="40" r="2.5" fill="#e24b4a" opacity="0.6"/>
+          </svg>
+        </div>
+        <div style="font-size:40px;font-weight:700;letter-spacing:3px;color:#e24b4a;margin-bottom:10px">INFECTED</div>
+        <div style="font-size:12px;color:#5a1a1a;letter-spacing:2px;margin-bottom:6px">YOU HAVE BEEN COMPROMISED</div>
+        <div style="font-size:10px;color:#3a1010;letter-spacing:1px">DO NOT REVEAL YOUR STATUS</div>`;
+    } else {
+      wrap.innerHTML=`
+        ${roundLabel}
+        <div style="width:110px;height:110px;margin:0 auto 24px">
+          <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <path d="M50 10 Q80 20 85 50 Q80 80 50 90 Q20 80 15 50 Q20 20 50 10 Z" fill="#0d2a10" stroke="#1e5a22" stroke-width="2"/>
+            <path d="M50 20 Q50 50 50 85" fill="none" stroke="#2a7a30" stroke-width="1" opacity="0.4"/>
+            <circle cx="50" cy="50" r="16" fill="#1a4a1e" stroke="#2a8a30" stroke-width="1.5"/>
+            <path d="M43 50 L47 54 L57 44" fill="none" stroke="#4aaa6a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div style="font-size:40px;font-weight:700;letter-spacing:3px;color:#4aaa6a;margin-bottom:10px">HEALTHY</div>
+        <div style="font-size:12px;color:#1a5a2a;letter-spacing:2px;margin-bottom:6px">YOU ARE UNINFECTED</div>
+        <div style="font-size:10px;color:#0d3a18;letter-spacing:1px">STAY VIGILANT — KEEP PAIRING</div>`;
+    }
   }
 
   /* ── CHALLENGE 1 PRODUCER ── */
@@ -1189,55 +1165,68 @@
   }
 
   /* ── CHALLENGE 2 PLAYER ── */
-  function enterCh2(){ch2Player={word:'',leftover:0,submitted:false};showScreen('s-ch2-play');startGameStatePolling();clearInterval(ch2State.playerPollId);renderCh2PlayerView();ch2State.playerPollId=setInterval(renderCh2PlayerView,500);}
-  function leaveCh2(){clearInterval(ch2State.playerPollId);stopGameStatePolling();showScreen('s-player');}
+  function enterCh5(){
+    // Only reset submission state if challenge hasn't started yet
+    if(ch5State.phase==='idle') ch5Player={word:'',leftover:0,submitted:false};
+    showScreen('s-ch5-play');
+    startGameStatePolling();
+    clearInterval(ch5State.playerPollId);
+    // Immediately poll so player gets current phase without waiting 5 seconds
+    pollGameState().then(()=>renderCh5PlayerView());
+    ch5State.playerPollId=setInterval(renderCh5PlayerView,500);
+  }
+  function leaveCh5(){clearInterval(ch5State.playerPollId);stopGameStatePolling();showScreen('s-player');}
 
-  function renderCh2PlayerView(){
-    const el=document.getElementById('ch2-player-content');if(!el)return;
-    const phase=ch2State.phase;
+  function renderCh5PlayerView(){
+    const el=document.getElementById('ch5-player-content');if(!el)return;
+    const phase=ch5State.phase;
     if(phase==='idle'){
       el.innerHTML=`<div style="text-align:center;padding:80px 20px"><div style="font-size:40px;color:#2a2a2a;margin-bottom:20px">⏳</div><div style="font-size:13px;color:#444;letter-spacing:2px;margin-bottom:8px">WAITING FOR PRODUCER</div><div style="font-size:11px;color:#2a2a2a;letter-spacing:1px">Collection phase has not started</div></div>`;
     }else if(phase==='collecting'){
-      const mins=Math.floor(ch2State.seconds/60);const secs=ch2State.seconds%60;
-      const display=mins+':'+String(secs).padStart(2,'0');const urgent=ch2State.seconds<=30;
       el.innerHTML=`<div style="text-align:center;padding-top:60px">
-        <div style="font-size:11px;color:#444;letter-spacing:3px;margin-bottom:12px">COLLECTION PHASE</div>
-        <div class="ch2-big-timer${urgent?' urgent':''}">${display}</div>
-        <div style="font-size:11px;color:${urgent?'#e24b4a':'#333'};letter-spacing:2px;margin-bottom:40px">${urgent?'HURRY — ALMOST TIME':'RACE FOR YOUR TILES'}</div>
-        <div style="background:#111;border:0.5px solid #1e1e1e;border-radius:14px;padding:20px;text-align:left">
-          <div style="font-size:10px;color:#c9a84c;letter-spacing:2px;margin-bottom:10px">REMEMBER</div>
-          <div style="font-size:12px;color:#666;line-height:1.8">Place tiles in your cup to secure.<br>Drop in another's cup to sabotage.<br>Unused tiles = -1 point each.</div>
-        </div></div>`;
+        <div style="font-size:11px;color:#7ec8e3;letter-spacing:3px;margin-bottom:20px">COLLECTION PHASE — ACTIVE</div>
+        <div style="font-size:72px;font-weight:700;color:#c9a84c;margin-bottom:8px;line-height:1">GO</div>
+        <div style="font-size:13px;color:#555;letter-spacing:2px;margin-bottom:40px">RACE FOR YOUR TILES</div>
+        <div style="background:#111;border:0.5px solid #1e1e1e;border-radius:14px;padding:20px;text-align:left;margin-top:8px">
+          <div style="font-size:10px;color:#c9a84c;letter-spacing:2px;margin-bottom:12px">REMEMBER</div>
+          <div style="font-size:13px;color:#888;line-height:2">
+            Place tiles in <strong style="color:#f0f0f0">your cup</strong> to secure them.<br>
+            Drop in <strong style="color:#f0f0f0">another's cup</strong> to sabotage.<br>
+            Unused tiles = <strong style="color:#e24b4a">-1 point</strong> each.
+          </div>
+        </div>
+        <div style="font-size:10px;color:#2a2a2a;letter-spacing:1px;margin-top:20px">Producer controls the timer</div>
+      </div>`;
     }else if(phase==='submitting'){
-      if(ch2Player.submitted){
-        const score=(ch2Player.word.length*2)-ch2Player.leftover;
+      if(ch5Player.submitted){
+        const score=(ch5Player.word.length*2)-ch5Player.leftover;
         el.innerHTML=`<div style="text-align:center;padding-top:40px">
           <div style="font-size:11px;color:#4a9;letter-spacing:2px;margin-bottom:20px">WORD SUBMITTED</div>
-          <div style="font-size:36px;font-weight:700;letter-spacing:4px;color:#4aaa6a;margin-bottom:16px">${ch2Player.word.toUpperCase()}</div>
+          <div style="font-size:36px;font-weight:700;letter-spacing:4px;color:#4aaa6a;margin-bottom:16px">${ch5Player.word.toUpperCase()}</div>
           <div class="ch2-submitted-banner">
             <div style="font-size:11px;color:#4a9;letter-spacing:2px;margin-bottom:8px">YOUR SCORE</div>
             <div style="font-size:36px;font-weight:700;color:#4aaa6a">${score>=0?'+':''}${score}</div>
-            <div style="font-size:11px;color:#2a5a2a;margin-top:8px;letter-spacing:1px">${ch2Player.word.length} letters × 2 = ${ch2Player.word.length*2} &nbsp;|&nbsp; ${ch2Player.leftover} unused = -${ch2Player.leftover}</div>
+            <div style="font-size:11px;color:#2a5a2a;margin-top:8px;letter-spacing:1px">${ch5Player.word.length} letters × 2 = ${ch5Player.word.length*2} &nbsp;|&nbsp; ${ch5Player.leftover} unused = -${ch5Player.leftover}</div>
           </div>
           <div style="font-size:11px;color:#2a2a2a;letter-spacing:1px;margin-top:20px">Awaiting producer validation</div></div>`;
-      }else{renderCh2SubmitForm(el);}
+      }else{renderCh5SubmitForm(el);}
     }else{
       el.innerHTML=`<div style="text-align:center;padding-top:80px"><div style="font-size:11px;color:#444;letter-spacing:2px;margin-bottom:20px">CHALLENGE COMPLETE</div><div style="font-size:18px;font-weight:700;color:#c9a84c;letter-spacing:2px">INTEL SCRAMBLE OVER</div><div style="font-size:11px;color:#333;margin-top:12px;letter-spacing:1px">Await producer announcement</div></div>`;
     }
   }
 
-  function renderCh2SubmitForm(el){
-    const word=ch2Player.word;const leftover=ch2Player.leftover;
+  function renderCh5SubmitForm(el){
+    const word=ch5Player.word;const leftover=ch5Player.leftover;
     const wordScore=word.length*2;const total=wordScore-leftover;
     el.innerHTML=`<div style="margin-bottom:8px;text-align:center"><div style="font-size:11px;color:#444;letter-spacing:2px">COLLECTION ENDED — SUBMIT YOUR WORD</div></div>
       <div class="ch2-phase">
         <div class="ch2-phase-title">YOUR BEST WORD</div>
-        <input class="ch2-input" id="ch2-word-input" type="text" maxlength="20" placeholder="TYPE YOUR WORD" value="${word}" oninput="ch2WordChanged(this.value)" autocomplete="off" autocorrect="off" spellcheck="false">
+        <input class="ch2-input" id="ch5-word-input" type="text" maxlength="20" placeholder="TYPE YOUR WORD" value="${word}" oninput="ch5WordChanged(this.value)" autocomplete="off" autocorrect="off" spellcheck="false">
         <div class="ch2-leftover-lbl">LEFTOVER TILES</div>
         <div class="ch2-leftover-row">
-          <button class="ch2-leftover-btn" onclick="ch2AdjLeftover(-1)">−</button>
+          <button class="ch2-leftover-btn" onclick="ch5AdjLeftover(-1)">−</button>
           <div class="ch2-leftover-num">${leftover}</div>
-          <button class="ch2-leftover-btn" onclick="ch2AdjLeftover(1)">+</button>
+          <button class="ch2-leftover-btn" onclick="ch5AdjLeftover(1)">+</button>
         </div>
         <div class="ch2-counter-row">
           <div class="ch2-counter-box"><div class="ch2-counter-val">${word.length}</div><div class="ch2-counter-lbl">LETTERS</div></div>
@@ -1245,47 +1234,47 @@
           <div class="ch2-counter-box"><div class="ch2-counter-val negative">-${leftover}</div><div class="ch2-counter-lbl">PENALTY</div></div>
           <div class="ch2-counter-box"><div class="ch2-counter-val" style="color:${total>=0?'#c9a84c':'#e24b4a'}">${total>=0?'+':''}${total}</div><div class="ch2-counter-lbl">TOTAL</div></div>
         </div>
-        <button class="gold-btn" onclick="ch2Submit()" ${!word?'disabled':''}>SUBMIT WORD</button>
+        <button class="gold-btn" onclick="ch5Submit()" ${!word?'disabled':''}>SUBMIT WORD</button>
       </div>`;
   }
 
-  function ch2WordChanged(val){ch2Player.word=val.toUpperCase().replace(/[^A-Z]/g,'');const input=document.getElementById('ch2-word-input');if(input)input.value=ch2Player.word;renderCh2SubmitForm(document.getElementById('ch2-player-content'));}
-  function ch2AdjLeftover(delta){ch2Player.leftover=Math.max(0,ch2Player.leftover+delta);renderCh2SubmitForm(document.getElementById('ch2-player-content'));}
+  function ch5WordChanged(val){ch5Player.word=val.toUpperCase().replace(/[^A-Z]/g,'');const input=document.getElementById('ch5-word-input');if(input)input.value=ch5Player.word;renderCh5SubmitForm(document.getElementById('ch5-player-content'));}
+  function ch5AdjLeftover(delta){ch5Player.leftover=Math.max(0,ch5Player.leftover+delta);renderCh5SubmitForm(document.getElementById('ch5-player-content'));}
 
-  async function ch2Submit(){
-    const word=ch2Player.word;const leftover=ch2Player.leftover;if(!word)return;
-    const score=(word.length*2)-leftover;ch2Player.submitted=true;
+  async function ch5Submit(){
+    const word=ch5Player.word;const leftover=ch5Player.leftover;if(!word)return;
+    const score=(word.length*2)-leftover;ch5Player.submitted=true;
     const name=currentPlayer.name;
-    ch2State.submissions[name]={word,leftover,score,status:'pending'};
-    renderCh2PlayerView();await saveSubmission(name,word,leftover,score);renderCh2ProdSubmissions();
+    ch5State.submissions[name]={word,leftover,score,status:'pending'};
+    renderCh5PlayerView();await saveSubmission(name,word,leftover,score);renderCh5ProdSubmissions();
   }
 
   /* ── CHALLENGE 2 PRODUCER ── */
-  function prodCh2ToggleTimer(){
-    if(ch2State.phase==='collecting'){
-      clearInterval(ch2State.intervalId);ch2State.intervalId=null;ch2State.phase='submitting';
-      const btn=document.getElementById('prod-ch2-start-btn');
+  function prodCh5ToggleTimer(){
+    if(ch5State.phase==='collecting'){
+      clearInterval(ch5State.intervalId);ch5State.intervalId=null;ch5State.phase='submitting';
+      const btn=document.getElementById('prod-ch5-start-btn');
       btn.textContent='COLLECTION ENDED';btn.classList.remove('running');btn.disabled=true;
-      document.getElementById('prod-ch2-phase-lbl').textContent='SUBMISSION PHASE';
-      document.getElementById('prod-ch2-msg').textContent='Players are now submitting words';
+      document.getElementById('prod-ch5-phase-lbl').textContent='SUBMISSION PHASE';
+      document.getElementById('prod-ch5-msg').textContent='Players are now submitting words';
       saveGameState('ch5_phase','submitting');
-    }else if(ch2State.phase==='idle'){
-      ch2State.phase='collecting';ch2State.seconds=CH2_COLLECT_SECS;
-      const btn=document.getElementById('prod-ch2-start-btn');
+    }else if(ch5State.phase==='idle'){
+      ch5State.phase='collecting';ch5State.seconds=CH2_COLLECT_SECS;
+      const btn=document.getElementById('prod-ch5-start-btn');
       btn.textContent='STOP COLLECTION';btn.classList.add('running');btn.disabled=false;
-      document.getElementById('prod-ch2-phase-lbl').textContent='COLLECTION PHASE — RUNNING';
-      document.getElementById('prod-ch2-msg').textContent='Collection phase started';
+      document.getElementById('prod-ch5-phase-lbl').textContent='COLLECTION PHASE — RUNNING';
+      document.getElementById('prod-ch5-msg').textContent='Collection phase started';
       saveGameState('ch5_phase','collecting');
-      ch2State.intervalId=setInterval(()=>{
-        ch2State.seconds--;
-        const mins=Math.floor(ch2State.seconds/60);const secs=ch2State.seconds%60;
-        document.getElementById('prod-ch2-timer').textContent=mins+':'+String(secs).padStart(2,'0');
-        if(ch2State.seconds<=0){
-          clearInterval(ch2State.intervalId);ch2State.intervalId=null;ch2State.phase='submitting';
-          const btn=document.getElementById('prod-ch2-start-btn');
+      ch5State.intervalId=setInterval(()=>{
+        ch5State.seconds--;
+        const mins=Math.floor(ch5State.seconds/60);const secs=ch5State.seconds%60;
+        document.getElementById('prod-ch5-timer').textContent=mins+':'+String(secs).padStart(2,'0');
+        if(ch5State.seconds<=0){
+          clearInterval(ch5State.intervalId);ch5State.intervalId=null;ch5State.phase='submitting';
+          const btn=document.getElementById('prod-ch5-start-btn');
           btn.textContent='COLLECTION ENDED';btn.classList.remove('running');btn.disabled=true;
-          document.getElementById('prod-ch2-phase-lbl').textContent='SUBMISSION PHASE';
-          document.getElementById('prod-ch2-msg').textContent='Time up — players now submitting';
+          document.getElementById('prod-ch5-phase-lbl').textContent='SUBMISSION PHASE';
+          document.getElementById('prod-ch5-msg').textContent='Time up — players now submitting';
           saveGameState('ch5_phase','submitting');
         }
       },1000);
@@ -1293,14 +1282,14 @@
     updateChallengeBadges();
   }
 
-  function prodCh2Reset(){
-    clearInterval(ch2State.intervalId);ch2State.intervalId=null;
-    ch2State.phase='idle';ch2State.seconds=CH2_COLLECT_SECS;
-    const btn=document.getElementById('prod-ch2-start-btn');
+  function prodCh5Reset(){
+    clearInterval(ch5State.intervalId);ch5State.intervalId=null;
+    ch5State.phase='idle';ch5State.seconds=CH2_COLLECT_SECS;
+    const btn=document.getElementById('prod-ch5-start-btn');
     btn.textContent='START COLLECTION';btn.classList.remove('running');btn.disabled=false;
-    document.getElementById('prod-ch2-timer').textContent='3:00';
-    document.getElementById('prod-ch2-phase-lbl').textContent='COLLECTION PHASE';
-    document.getElementById('prod-ch2-msg').textContent='Timer reset';
+    document.getElementById('prod-ch5-timer').textContent='3:00';
+    document.getElementById('prod-ch5-phase-lbl').textContent='COLLECTION PHASE';
+    document.getElementById('prod-ch5-msg').textContent='Timer reset';
     saveGameState('ch5_phase','idle');
     updateChallengeBadges();
   }
@@ -1320,9 +1309,9 @@
           const data=JSON.parse(await res.text());
           if(data.submissions){
             data.submissions.forEach(sub=>{
-              ch2State.submissions[sub.name]={word:sub.word,leftover:sub.leftover,score:sub.score,status:sub.status};
+              ch5State.submissions[sub.name]={word:sub.word,leftover:sub.leftover,score:sub.score,status:sub.status};
             });
-            renderCh2ProdSubmissions();
+            renderCh5ProdSubmissions();
             return;
           }
         }catch(e){continue;}
@@ -1330,9 +1319,9 @@
     }catch(e){}
   }
 
-  function renderCh2ProdSubmissions(){
-    const el=document.getElementById('prod-ch2-submissions');if(!el)return;
-    const subs=Object.entries(ch2State.submissions);
+  function renderCh5ProdSubmissions(){
+    const el=document.getElementById('prod-ch5-submissions');if(!el)return;
+    const subs=Object.entries(ch5State.submissions);
     if(subs.length===0){el.innerHTML=`<div style="font-size:11px;color:#2a2a2a;letter-spacing:1px;text-align:center;padding:16px 0">No submissions yet</div>`;return;}
     const sorted=subs.sort((a,b)=>({approved:0,pending:1,rejected:2}[a[1].status]||1)-({approved:0,pending:1,rejected:2}[b[1].status]||1));
     el.innerHTML=sorted.map(([name,sub])=>`
@@ -1341,22 +1330,22 @@
         <div class="sub-word ${sub.status}">${sub.word}</div>
         <div class="sub-meta">${sub.word.length} letters × 2 = ${sub.word.length*2} pts &nbsp;|&nbsp; ${sub.leftover} unused = -${sub.leftover} pts</div>
         <div class="sub-score">${sub.status==='approved'?'✓ APPROVED — ':sub.status==='rejected'?'✗ REJECTED — ':''}SCORE: ${sub.score>=0?'+':''}${sub.score}</div>
-        ${sub.status==='pending'?`<div class="sub-btns"><button class="sub-approve" onclick="ch2Approve('${name}')">APPROVE</button><button class="sub-reject" onclick="ch2Reject('${name}')">REJECT</button></div>`:''}
+        ${sub.status==='pending'?`<div class="sub-btns"><button class="sub-approve" onclick="ch5Approve('${name}')">APPROVE</button><button class="sub-reject" onclick="ch5Reject('${name}')">REJECT</button></div>`:''}
       </div>`).join('');
   }
 
-  function ch2Approve(name){
-    if(ch2State.submissions[name]){
-      ch2State.submissions[name].status='approved';
-      renderCh2ProdSubmissions();
+  function ch5Approve(name){
+    if(ch5State.submissions[name]){
+      ch5State.submissions[name].status='approved';
+      renderCh5ProdSubmissions();
       saveSubmissionVerdict('ch5',name,'approved');
     }
   }
-  function ch2Reject(name){
-    if(ch2State.submissions[name]){
-      ch2State.submissions[name].status='rejected';
-      ch2State.submissions[name].score=0;
-      renderCh2ProdSubmissions();
+  function ch5Reject(name){
+    if(ch5State.submissions[name]){
+      ch5State.submissions[name].status='rejected';
+      ch5State.submissions[name].score=0;
+      renderCh5ProdSubmissions();
       saveSubmissionVerdict('ch5',name,'rejected');
     }
   }
