@@ -719,7 +719,8 @@
   async function tryFetch() {
     setMsg('CONNECTING TO COMMAND...');
     try {
-      const text = await fetchAnyProxy(SHEET_URL, 6000);
+      const bustUrl = SHEET_URL + '&_t=' + Date.now();
+      const text = await fetchAnyProxy(bustUrl, 6000);
       const parsed = parseCSV(text);
       if (parsed.length > 0) return parsed;
       throw new Error('empty parse');
@@ -764,15 +765,15 @@
     }catch(e){}
   }
 
-  // ── GAME STATE POLLING — runs every 5s on player screens ──
+  // ── GAME STATE POLLING — runs on player screens ──
   let gsPoller = null;
   let lastGameState = {};
 
   function startGameStatePolling(fast=false) {
     stopGameStatePolling();
     pollGameState();
-    // Poll every 2 seconds on challenge screens, 5 seconds otherwise
-    gsPoller = setInterval(pollGameState, fast ? 2000 : 5000);
+    // Poll every 2 seconds on challenge screens, 3 seconds otherwise
+    gsPoller = setInterval(pollGameState, fast ? 2000 : 3000);
   }
 
   function stopGameStatePolling() {
@@ -781,7 +782,8 @@
   }
 
   async function pollGameState() {
-    const baseUrl = SHEET_URL.replace('gid=0','gid=574646101');
+    // Add cache-busting timestamp so Google doesn't serve a stale cached CSV
+    const baseUrl = SHEET_URL.replace('gid=0','gid=574646101') + '&_t=' + Date.now();
     try {
       const text = await fetchAnyProxy(baseUrl, 4000);
       const gs = parseGameStateCSV(text);
@@ -789,7 +791,7 @@
         applyGameState(gs);
       }
     } catch(e) {
-      // Silent fail — next poll will retry in 5 seconds
+      // Silent fail — next poll will retry
     }
   }
 
