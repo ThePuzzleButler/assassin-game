@@ -296,6 +296,7 @@
     <div style="position:absolute;top:20px;left:20px;z-index:10">
       <button class="back-btn" onclick="leaveCh1()">← EXIT</button>
     </div>
+    <div style="position:absolute;top:24px;right:20px;z-index:10;font-size:10px;color:#2a2a2a;letter-spacing:1px" id="ch1-sync-note">SYNCING...</div>
     <div class="ch1-status-wrap" id="ch1-status-wrap"></div>
   </div>
 
@@ -747,30 +748,45 @@
   }
 
   async function pollGameState() {
-    try {
-      const proxies = [
-        u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
-        u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`
-      ];
-      const gsUrl = SCRIPT_URL + '?action=gamestate';
-      for (let i = 0; i < proxies.length; i++) {
-        try {
-          const res = await fetchWithTimeout(proxies[i](gsUrl), 4000);
-          if (!res.ok) continue;
-          const text = await res.text();
-          const gs = JSON.parse(text);
-          if (gs && !gs.error) {
-            applyGameState(gs);
-            return;
-          }
-        } catch(e) { continue; }
-      }
-    } catch(e) {}
+    // Read GameState from the published sheet CSV — same method that already works for player data
+    // GameState tab is published separately as gid=1 (second tab)
+    const baseUrl = SHEET_URL.replace('gid=0','gid=574646101');
+    const proxies = [
+      u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+      u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+      u => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`
+    ];
+    for (let i = 0; i < proxies.length; i++) {
+      try {
+        const res = await fetchWithTimeout(proxies[i](baseUrl), 4000);
+        if (!res.ok) continue;
+        const text = await res.text();
+        if (!text || text.trim().length < 5) continue;
+        const gs = parseGameStateCSV(text);
+        if (gs && Object.keys(gs).length > 0) {
+          applyGameState(gs);
+          return;
+        }
+      } catch(e) { continue; }
+    }
+  }
+
+  function parseGameStateCSV(text) {
+    const rows = text.trim().split('\n').slice(1);
+    const state = {};
+    rows.forEach(row => {
+      const cols = row.split(',').map(c => c.trim().replace(/^"|"$/g,''));
+      if (cols[0]) state[cols[0]] = cols[1] || '';
+    });
+    return state;
   }
 
   function applyGameState(gs) {
     const prev = lastGameState;
     lastGameState = gs;
+    // Update sync indicator
+    const note = document.getElementById('ch1-sync-note');
+    if (note) { note.textContent = 'LIVE ' + new Date().toLocaleTimeString(); note.style.color = '#2a4a2a'; }
 
     // Update ch1 state from sheet
     const newRound = parseInt(gs.ch1_round) || 0;
